@@ -53,6 +53,7 @@ import jax.numpy as jnp
 from jax.scipy.sparse.linalg import gmres
 
 from dftax.ks.energy import KS
+from dftax.ks.eigh import eigh as _offload_eigh
 
 
 def _sym(A):
@@ -78,7 +79,7 @@ def _warn_cphf_residual(resid, tol: float = 1e-6):
 
 
 def _lowdin(S, eps: float = 1e-9):
-    s, U = jnp.linalg.eigh(S)
+    s, U = _offload_eigh(S)
     return (U * (1.0 / jnp.sqrt(jnp.clip(s, eps)))) @ U.T
 
 
@@ -86,7 +87,7 @@ def _lowdin(S, eps: float = 1e-9):
 def _proj_from_fock(Ft, nocc):
     """Closed-shell density ``P̃ = 2 Σ_i u_i u_iᵀ`` in the orthonormal basis from the
     orthonormal Fock ``Ft`` (``u`` = eigenvectors). ``nocc`` is static."""
-    _, U = jnp.linalg.eigh(_sym(Ft))
+    _, U = _offload_eigh(_sym(Ft))
     Uo = U[:, :nocc]
     return 2.0 * Uo @ Uo.T
 
@@ -95,7 +96,7 @@ def _proj_from_fock(Ft, nocc):
 def _proj_jvp(primals, tangents):
     Ft, nocc = primals
     dFt, _ = tangents
-    eps, U = jnp.linalg.eigh(_sym(Ft))
+    eps, U = _offload_eigh(_sym(Ft))
     P = 2.0 * U[:, :nocc] @ U[:, :nocc].T
     # First-order projector response: δP̃ = 2 U (T + Tᵀ) Uᵀ with T on the virt-occ
     # block only, T_ai = (Uᵀ δFt U)_ai / (ε_i − ε_a); denominators are occ-virt gaps,

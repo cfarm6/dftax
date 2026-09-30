@@ -70,6 +70,7 @@ from dftax.integrals import (
 from dftax.integrals.eri4c import eri4c_matrix, plan_eri4c
 from dftax.integrals.shell_pairs import N_CART
 from dftax.system.molecule import symbol_to_Z
+from dftax.ks.eigh import eigh as _offload_eigh
 
 
 # ---------------------------------------------------------------------------
@@ -613,7 +614,7 @@ def _aufbau_density(F, X, nocc):
     the same fill as the SCF loop's ``make_density``."""
     nspin = len(nocc)
     Fs = jnp.broadcast_to(F, (nspin, *F.shape)) if F.ndim == 2 else F
-    _, Cp = jnp.linalg.eigh(X.T @ Fs @ X)
+    _, Cp = _offload_eigh(X.T @ Fs @ X)
     C = X @ Cp
     nmax = max(nocc)
     w = 2.0 if nspin == 1 else 1.0

@@ -37,6 +37,7 @@ import optax
 from jaxtyping import Array, Float
 
 from dftax.ks.energy import KS
+from dftax.ks.eigh import eigh
 from dftax.ks.guess import GuessSpec, density_from_guess
 from dftax.ks.scf import (
     KSResult,
@@ -64,7 +65,7 @@ def _guess_orbitals(ks: KS, guess) -> tuple[Float[Array, "nao nocc"], ...]:
     X = canonical_orthonormalizer(ks.S)
     P0 = density_from_guess(ks, guess, X)
     F = _fock_stacked(ks, P0)                       # (nspin, nao, nao)
-    _, Cp = jnp.linalg.eigh(X.T @ F @ X)
+    _, Cp = eigh(X.T @ F @ X)
     C = X @ Cp                                       # (nspin, nao, nmo)
     return tuple(C[s][:, :n] for s, n in enumerate(ks.nocc))
 
@@ -170,7 +171,7 @@ def minimize(
     e_tot = float(_total_energy(ks, P))
     X = canonical_orthonormalizer(ks.S)
     F = _fock_stacked(ks, P)
-    eps, Cp = jnp.linalg.eigh(X.T @ F @ X)             # batched over channels
+    eps, Cp = eigh(X.T @ F @ X)             # batched over channels
     C = X @ Cp
     return KSResult(
         e_tot=e_tot,

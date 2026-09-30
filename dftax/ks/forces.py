@@ -32,6 +32,7 @@ from dftax.basis.loader import build_basis_data
 from dftax.grid import Becke, becke, becke_grid, becke_grid_size, points
 from dftax.integrals import overlap_matrix
 from dftax.ks.energy import KS, System, _resolve_chunk, _resolve_df_chunk
+from dftax.ks.eigh import eigh
 from dftax.ks.scf import KSResult
 from dftax.ks.terms import (
     DFSpec,
@@ -52,11 +53,11 @@ def _natural_orbitals(P, S):
     Forward-only (the coefficients and occupations are ``stop_gradient``-ed in
     the caller, so this eigh is never differentiated).
     """
-    sval, svec = jnp.linalg.eigh(S)
+    sval, svec = eigh(S)
     sval = jnp.clip(sval, 1e-12, None)
     s_h = (svec * jnp.sqrt(sval)) @ svec.T
     s_ih = (svec / jnp.sqrt(sval)) @ svec.T
-    f, u = jnp.linalg.eigh(s_h @ P @ s_h)
+    f, u = eigh(s_h @ P @ s_h)
     return s_ih @ u, f                                     # (nao, nmo), (nmo,)
 
 

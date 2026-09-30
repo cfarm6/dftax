@@ -45,6 +45,7 @@ from dftax.energy.potentials import xc_potential
 from dftax.energy.xc import XCFunctional
 from dftax.integrals.eri3c import _DF_BRA_BUDGET, _contracted_eri3c, _eri3c_sizes
 from dftax.integrals.eri4c import coulomb_j_4c, exchange_k_4c
+from dftax.ks.eigh import eigh as _cpu_eigh
 from dftax.utils.vmap import vmap as _chunked_vmap
 
 
@@ -192,7 +193,7 @@ def _metric_pinv(V: Float[Array, "naux naux"]) -> Float[Array, "naux naux"]:
     eigenvalues of symmetric molecules (Td/Oh); they NaN the density-fitted forces on
     GPU (cuSolver). The forward value is identical to the eigh pseudo-inverse.
     """
-    w, U = jnp.linalg.eigh(V)
+    w, U = _cpu_eigh(V)
     inv_w = jnp.where(w > 1e-7 * w[-1], 1.0 / w, 0.0)
     return (U * inv_w) @ U.T
 
@@ -447,11 +448,11 @@ def _rik_occ_orbitals(P, S, nocc, dscale=0.5):
     only inside the RI-K custom_vjp forward; its gradient is supplied analytically,
     so this eigh is never differentiated (avoids the degenerate-occupation blow-up).
     """
-    sval, svec = jnp.linalg.eigh(S)
+    sval, svec = _cpu_eigh(S)
     sval = jnp.clip(sval, 1e-12, None)
     s_ih = (svec / jnp.sqrt(sval)) @ svec.T
     s_h = (svec * jnp.sqrt(sval)) @ svec.T
-    _, evec = jnp.linalg.eigh(s_h @ (dscale * P) @ s_h)
+    _, evec = _cpu_eigh(s_h @ (dscale * P) @ s_h)
     # Index from the right edge, NOT evec[:, -nocc:]: for an empty spin channel
     # (nocc==0, e.g. the β channel of a one-electron UKS system) `-0 == 0` would
     # select ALL columns instead of none. `nocc` is static, so this slice is fixed.
@@ -461,7 +462,7 @@ def _rik_occ_orbitals(P, S, nocc, dscale=0.5):
 
 def _rik_cholesky(int2c_inv):
     """Factor ``L`` with ``V⁻¹ = L Lᵀ`` (from the symmetric eigendecomposition)."""
-    w, U = jnp.linalg.eigh(int2c_inv)
+    w, U = _cpu_eigh(int2c_inv)
     return U * jnp.sqrt(jnp.clip(w, 0.0, None))            # (naux, naux)
 
 

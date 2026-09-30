@@ -45,6 +45,7 @@ from dftax.ks.guess import (
 from dftax.ks.shard import MeshSpec, _resolve_mesh
 from dftax.ks.scf import _scf_solve
 from dftax.ks.terms import DFSpec, ExactSpec, df
+from dftax.ks.eigh import eigh as _offload_eigh
 from dftax.utils.vmap import vmap as _chunked_vmap
 
 
@@ -53,7 +54,7 @@ def _lowdin(S, eps: float = 1e-9):
     so it vmaps cleanly (unlike the canonical orthonormalizer, which drops near-null
     directions and so has a data-dependent column count). Eigenvalues are clipped for
     safety; assumes the basis is not severely linearly dependent."""
-    s, U = jnp.linalg.eigh(S)
+    s, U = _offload_eigh(S)
     return (U * (1.0 / jnp.sqrt(jnp.clip(s, eps)))) @ U.T
 
 
