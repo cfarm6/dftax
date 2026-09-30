@@ -31,6 +31,7 @@ from jax import lax
 from jaxtyping import Array
 
 from dftax.ks.energy import KS
+from dftax.ks.eigh import eigh
 from dftax.ks.guess import GuessSpec, density_from_guess
 from dftax.ks.scf import KSResult, _fock_stacked, canonical_orthonormalizer
 
@@ -270,7 +271,7 @@ def roks(
     P0 = density_from_guess(ks, guess, X)
     F = _fock_stacked(ks, P0)
     # Shared reference orbitals from the spin-averaged Fock (values only).
-    _, Cp = jnp.linalg.eigh(X.T @ (0.5 * (F[0] + F[1])) @ X)
+    _, Cp = eigh(X.T @ (0.5 * (F[0] + F[1])) @ X)
     C0 = X @ Cp
     nmo = C0.shape[1]
     # occupation classes: 2 = doubly occupied, 1 = singly, 0 = virtual;
@@ -285,7 +286,7 @@ def roks(
         jnp.asarray(e_tol), cg_iters, trust, verbose,
     )
     F = _fock_stacked(ks, P)
-    eps, Cp = jnp.linalg.eigh(X.T @ (0.5 * (F[0] + F[1])) @ X)
+    eps, Cp = eigh(X.T @ (0.5 * (F[0] + F[1])) @ X)
     result = KSResult(
         e_tot=float(e_tot),
         e_elec=float(e_tot) - float(ks.e_nn) - float(ks.e_disp),
@@ -349,7 +350,7 @@ def newton(
     # Reference orbitals: aufbau eigenvectors of the Fock at the guess
     # density (values only; nothing here is differentiated through eigh).
     F = _fock_stacked(ks, P0)
-    _, Cp = jnp.linalg.eigh(X.T @ F @ X)
+    _, Cp = eigh(X.T @ F @ X)
     C0 = tuple((X @ Cp)[s] for s in range(len(ks.nocc)))
 
     e_tot, P, C, converged, n_iter = _newton_solve(
@@ -358,7 +359,7 @@ def newton(
     )
     # Canonical orbital energies at the converged density (report only).
     F = _fock_stacked(ks, P)
-    eps, Cp = jnp.linalg.eigh(X.T @ F @ X)
+    eps, Cp = eigh(X.T @ F @ X)
     result = KSResult(
         e_tot=float(e_tot),
         e_elec=float(e_tot) - float(ks.e_nn) - float(ks.e_disp),

@@ -387,23 +387,30 @@ def ao_on_grid(
     return jax.vmap(lambda r: eval_gto_and_grad(basis, r))(coords)
 
 
-@eqx.filter_jit
-def _build_integrals(
+def _on_tt(*arrays) -> bool:
+    """True when the first concrete array input lives on a TT device.
+
+    Tracers (a traced KS rebuild under jit/grad/vmap, e.g. forces/batched)
+    return False: the CPU helper needs concrete arrays, so traced TT builds
+    stay on the jitted path and fail in the backend instead of here.
+    """
+    for a in arrays:
+        if isinstance(a, jax.core.Tracer):
+            return False
+        if isinstance(a, jax.Array):
+            try:
+                return next(iter(a.devices())).platform == "tt"
+            except Exception:
+                return False
+    return False
+
+
+def _build_integrals_impl(
     basis, coords, charges, grid_coords, aux_basis, materialize_ao, materialize_int3c,
     eri_quartets=None, eri_qof=None, stream_exact=False, omega=None,
     eri3c_plan=None, pair_plan=None, aux_pair_plan=None, eri4c_plan=None,
 ):
-    """Build all integral arrays in one jitted pass.
-
-    Jitting fuses the builders (eager mode dispatches each op unfused, e.g.
-    eri4c is ~2x slower eager than jitted). ``aux_basis is None`` selects the
-    exact 4-center ERI; otherwise RI-J/RI-K density-fitting tensors. When
-    ``materialize_ao`` is False the AO grid values/gradients are not precomputed
-    (the XC grid is streamed instead; see ``terms._streamed_e_xc``). ``eri_quartets``/
-    ``eri_qof`` optionally supply a pre-screened (Cauchy-Schwarz) quartet list +
-    orbit map for the exact ERI. Composes with grad (used by forces), where jit
-    is traced inline.
-    """
+    """Eager body of :func:`_build_integrals` (see it for the contract)."""
     # One bucketed pass builds both (shared OS tables per shell pair); the
     # public overlap_matrix / kinetic_matrix wrappers stay for direct users.
     S, T = overlap_kinetic_bucketed(basis, plan=pair_plan)
@@ -459,6 +466,57 @@ def _build_integrals(
 
     return (S, T + V, ao, dao, e_nn, eri, int3c, int2c_inv,
             eri_lr, int3c_lr, int2c_inv_lr)
+
+@eqx.filter_jit
+def _build_integrals_jitted(
+    basis, coords, charges, grid_coords, aux_basis, materialize_ao, materialize_int3c,
+    eri_quartets=None, eri_qof=None, stream_exact=False, omega=None,
+    eri3c_plan=None, pair_plan=None, aux_pair_plan=None, eri4c_plan=None,
+):
+    """Jitted body of :func:`_build_integrals` (the CPU path)."""
+    return _build_integrals_impl(
+        basis, coords, charges, grid_coords, aux_basis, materialize_ao,
+        materialize_int3c, eri_quartets, eri_qof, stream_exact, omega,
+        eri3c_plan, pair_plan, aux_pair_plan, eri4c_plan,
+    )
+
+
+def _build_integrals(
+    basis, coords, charges, grid_coords, aux_basis, materialize_ao, materialize_int3c,
+    eri_quartets=None, eri_qof=None, stream_exact=False, omega=None,
+    eri3c_plan=None, pair_plan=None, aux_pair_plan=None, eri4c_plan=None,
+):
+    """Build all integral arrays in one jitted pass.
+
+    The CPU path jits the builders (fused; eager dispatches each op unfused,
+    e.g. eri4c is ~2x slower eager than jitted) and composes with grad (used
+    by forces), where jit is traced inline. TT does not yet support all
+    integral kernels or ``eigh``, so concrete TT inputs are built on CPU and
+    the results are copied back. Traced TT rebuilds cannot use that transfer.
+    """
+    if _on_tt(coords, charges, grid_coords):
+        device = next(iter(coords.devices()))
+        cpu = jax.devices("cpu")[0]
+        args = (
+            basis, coords, charges, grid_coords, aux_basis, materialize_ao,
+            materialize_int3c, eri_quartets, eri_qof, stream_exact, omega,
+            eri3c_plan, pair_plan, aux_pair_plan, eri4c_plan,
+        )
+        args = jax.tree.map(
+            lambda x: jax.device_put(x, cpu) if isinstance(x, jax.Array) else x,
+            args,
+        )
+        with jax.default_device(cpu):
+            result = _build_integrals_jitted(*args)
+        return jax.tree.map(
+            lambda x: jax.device_put(x, device) if isinstance(x, jax.Array) else x,
+            result,
+        )
+    return _build_integrals_jitted(
+        basis, coords, charges, grid_coords, aux_basis, materialize_ao,
+        materialize_int3c, eri_quartets, eri_qof, stream_exact, omega,
+        eri3c_plan, pair_plan, aux_pair_plan, eri4c_plan,
+    )
 
 
 class KS(eqx.Module):
@@ -554,7 +612,21 @@ class KS(eqx.Module):
 
         coords = jnp.asarray(coords)
         charges = jnp.asarray(charges, dtype=coords.dtype)
-        grid_coords, grid_weights, grid_chunk = _resolve_grid(grid, symbols, coords)
+        if _on_tt(coords) and (grid is None or isinstance(grid, Becke)):
+            # Resolve the eager, value-pruned Becke grid on CPU for platform-
+            # independent pruning; transfer the resulting quadrature to TT.
+            device = next(iter(coords.devices()))
+            cpu = jax.devices("cpu")[0]
+            with jax.default_device(cpu):
+                grid_coords, grid_weights, grid_chunk = _resolve_grid(
+                    grid, symbols, jax.device_put(coords, cpu)
+                )
+            grid_coords = jax.device_put(grid_coords, device)
+            grid_weights = jax.device_put(grid_weights, device)
+        else:
+            grid_coords, grid_weights, grid_chunk = _resolve_grid(
+                grid, symbols, coords
+            )
         grid_coords = jnp.asarray(grid_coords)
         weights = jnp.asarray(grid_weights)
 
@@ -793,6 +865,21 @@ class KS(eqx.Module):
         calls, which ``total`` / ``electronic`` still provide for every other
         consumer (forces, the Hessian, Newton, direct minimization).
         """
+        if _on_tt(P):
+            # TT lacks eigh and some autodiff/XC kernels. Keep this entire
+            # differentiable Fock evaluation on CPU, not traced intermediates.
+            device = next(iter(P.devices()))
+            cpu = jax.devices("cpu")[0]
+            on_cpu = jax.tree.map(
+                lambda x: jax.device_put(x, cpu) if isinstance(x, jax.Array) else x,
+                self,
+            )
+            with jax.default_device(cpu):
+                energy, fock = on_cpu.energy_and_fock(
+                    jax.device_put(P, cpu), idempotent
+                )
+            return jax.device_put(energy, device), jax.device_put(fock, device)
+
         e1, g1 = jax.value_and_grad(
             lambda Q: jnp.sum(jnp.sum(Q, axis=0) * self.hcore))(P)
         e_2e, g_2e = self.coulomb.energy_and_potential(

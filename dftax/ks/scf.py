@@ -9,10 +9,11 @@ One solver serves both shell structures: the density is spin-stacked
 ``(nspin, nao, nao)`` with per-channel occupations from ``ks.nocc`` (a doubly
 occupied single channel for a closed shell, unit-occupation α/β channels for a
 spin-polarized system), and DIIS runs on the channel-stacked Fock/error
-super-matrices, so the restricted solve is literally the ``nspin=1`` case of
-the unrestricted one. The whole self-consistency loop runs on device in a
-single ``lax.while_loop`` (DIIS history kept in a fixed-size circular buffer),
-so there are no per-iter host round-trips and the entire solve compiles once.
+super-matrices, so restricted and unrestricted cases use the same solver.
+
+The CPU solver keeps the loop in one ``lax.while_loop``. TT KS arrays are
+copied to CPU for the SCF solve, then orbital and density outputs return to
+TT; TT-XLA lacks several required linear algebra and autodiff kernels.
 
 :func:`scf` wraps the solver and packs the stacked outputs into a
 :class:`KSResult`.
@@ -29,9 +30,27 @@ import jax.numpy as jnp
 from jax import lax
 from jaxtyping import Array, Float
 
-from dftax.ks.energy import KS
+from dftax.ks.eigh import eigh as _offload_eigh
 from dftax.ks.guess import GuessSpec, density_from_guess
 
+def _on_tt(*arrays) -> bool:
+    """True when the first concrete array input lives on a TT device.
+
+    Tracers (a traced rebuild under jit/grad/vmap, e.g. forces, batched)
+    return False: the CPU eigh helper needs concrete arrays, so traced TT
+    inputs stay on the compiled path and fail in the backend instead of here.
+    """
+    import jax.core as _jc
+
+    for a in arrays:
+        if isinstance(a, _jc.Tracer):
+            return False
+        if isinstance(a, jax.Array):
+            try:
+                return next(iter(a.devices())).platform == "tt"
+            except Exception:
+                return False
+    return False
 
 @eqx.filter_jit
 def _total_energy(ks: KS, P: Float[Array, "nspin nao nao"]) -> Array:
@@ -79,7 +98,23 @@ def canonical_orthonormalizer(
     bases. Run eagerly (outside the jitted loop) so the kept-column count, and
     hence X's shape, is concrete.
     """
-    s, U = jnp.linalg.eigh(S)
+    if _on_tt(S):
+        # TT has no eigh kernel: diagonalize on CPU via the shared helper,
+        # then apply the data-dependent column drop on host copies so X's
+        # shape stays a static Python int (no dynamic TT-side slice).
+        import numpy as np
+
+        dev = next(iter(S.devices()))
+        s, U = _offload_eigh(S)
+        s_h = np.asarray(jax.device_put(s, jax.devices("cpu")[0]))
+        U_h = np.asarray(jax.device_put(U, jax.devices("cpu")[0]))
+        keep = s_h > thresh
+        s_keep = s_h[keep]
+        return jax.device_put(
+            jnp.asarray(U_h[:, keep] / np.sqrt(s_keep)[None, :], dtype=S.dtype),
+            dev,
+        )
+    s, U = _offload_eigh(S)
     keep = s > thresh
     s_keep = s[keep]
     U_keep = U[:, keep]
@@ -307,7 +342,7 @@ def _scf_solve(ks: KS, X, P0, max_iter, e_tol, d_tol, m, verbose, level_shift,
     inv_w = 0.5 if nspin == 1 else 1.0
 
     def make_density(F):                     # F: (nspin, nao, nao)
-        eps, Cp = jnp.linalg.eigh(X.T @ F @ X)          # batched over channels
+        eps, Cp = _offload_eigh(X.T @ F @ X)       # batched over channels
         C = X @ Cp                                       # (nspin, nao, nmo)
         if smear_sigma is not None:
             # fractional occupations are dynamic in eps: no occupied slice
@@ -400,6 +435,9 @@ def _scf_solve(ks: KS, X, P0, max_iter, e_tol, d_tol, m, verbose, level_shift,
     return e_prev - ts, P, C, eps, converged, it, ts
 
 
+
+
+
 def _reject_smeared_frozen_exchange(ks, smearing):
     """Refuse fractional occupations on a backend whose exchange assumes none.
 
@@ -489,29 +527,39 @@ def scf(
             energies through level crossings); ``None`` is the aufbau fill.
         verbose: print per-iteration energy / error (via jax.debug.print).
 
-    Example:
-        ```python
-        ks = KS(mol, PBE())
-        res = scf(ks, e_tol=1e-9)
-        res = scf(ks, guess=sad())               # fewer iterations
         res.e_tot, res.converged, res.P[0]       # P is spin-stacked
         ```
     """
     _reject_smeared_frozen_exchange(ks, smearing)
-    X = canonical_orthonormalizer(ks.S, lindep_thresh)
-    P0 = density_from_guess(ks, guess, X)
-    # Tolerances ride along as traced arrays: under filter_jit a Python scalar
-    # is a static argument, so retrying with level_shift or a tighter e_tol
-    # would otherwise recompile the whole solve. diis_space (buffer shape) and
-    # verbose (Python branch) must stay static.
-    if accel is not None:
-        diis_space = accel.space
-    e_tot, P, C, eps, converged, n_iter, ts = _scf_solve(
-        ks, X, P0, jnp.asarray(max_iter), jnp.asarray(e_tol), jnp.asarray(d_tol),
-        diis_space, verbose, jnp.asarray(level_shift),
-        accel.switch if accel is not None else None,
-        smearing.sigma if smearing is not None else None,
-    )
+    device = None
+    if _on_tt(ks.S):
+        device = next(iter(ks.S.devices()))
+        cpu = jax.devices("cpu")[0]
+        ks = jax.tree.map(
+            lambda x: jax.device_put(x, cpu) if isinstance(x, jax.Array) else x,
+            ks,
+        )
+        guess = jax.tree.map(
+            lambda x: jax.device_put(x, cpu) if isinstance(x, jax.Array) else x,
+            guess,
+        )
+    compute_device = cpu if device is not None else next(iter(ks.S.devices()))
+    with jax.default_device(compute_device):
+        X = canonical_orthonormalizer(ks.S, lindep_thresh)
+        if accel is not None:
+            diis_space = accel.space
+        adiis_switch = accel.switch if accel is not None else None
+        smear_sigma = smearing.sigma if smearing is not None else None
+        P0 = density_from_guess(ks, guess, X)
+        # Tolerances ride along as traced arrays: under filter_jit a Python
+        # scalar is static, so changing one would otherwise recompile the solve.
+        e_tot, P, C, eps, converged, n_iter, ts = _scf_solve(
+            ks, X, P0, jnp.asarray(max_iter), jnp.asarray(e_tol),
+            jnp.asarray(d_tol), diis_space, verbose, jnp.asarray(level_shift),
+            adiis_switch, smear_sigma,
+        )
+    if device is not None:
+        P, C, eps = jax.tree.map(lambda x: jax.device_put(x, device), (P, C, eps))
     result = KSResult(
         e_tot=float(e_tot),
         e_elec=float(e_tot) - float(ks.e_nn) - float(ks.e_disp),
