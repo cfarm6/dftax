@@ -6,34 +6,63 @@
 - Boundary: [Decide libxckernel's role in JAX XC](https://github.com/cfarm6/dftax/issues/6) — separate XC functional backend vs XC grid execution modes; libxckernel is never a formula or host-physics provider.
 - Prerequisite oracle: [Provision pinned Libxc default-parameter oracle](https://github.com/cfarm6/dftax/issues/12) — `/tmp/xcoracle-po`, 709-identity ledger, 154 composite readbacks.
 - Companion audits: [Inventory Libxc semilocal coverage and defaults](https://github.com/cfarm6/dftax/issues/3), [Recover faithful Libxc primal expressions](https://github.com/cfarm6/dftax/issues/4).
-- License: Libxc is MPL-2.0 (`COPYING` at pin). SymPy-tree expressions carry upstream provenance; redistribution/attribution is a packaging question, not resolved here.
-- Method: per-identity `src/*.c` `xc_func_info_*` flags/family/kind + `oracle-primal-ledger.json` spin outcomes + `oracle-composites.json` readbacks + pinned-source spot checks. No class excluded. Capability groupings are facts, not support policy.
+- Method: fresh parse of per-identity `src/*.c` `xc_func_info_*` flags/family/kind + `oracle-primal-ledger.json` spin outcomes + `oracle-composites.json` readbacks + pinned-source spot checks. No class excluded. Capability groupings are facts, not support policy.
+
+## Primary sources (all at Libxc pin `7d23678`, GitLab)
+
+Pinned-tree link root: `https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/`.
+
+- Flag vocabulary: [`src/xc.h`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/xc.h) — `XC_FLAGS_HYB_CAM` (`:64`, erf range separation), `XC_FLAGS_HYB_CAMY` (`:66`, Yukawa; `:68-70` deprecation-alias notes), `XC_FLAGS_VV10` (`:67`), `XC_FLAGS_HYB_LC/LCY` (`:69-71`, local-hybrid machinery bits), `XC_FLAGS_STABLE` (`:72`), `XC_FLAGS_DEVELOPMENT` (`:74`), `XC_FLAGS_NEEDS_LAPLACIAN` (`:75`), `XC_FLAGS_NEEDS_TAU` (`:76`), `XC_FLAGS_ENFORCE_FHC` (`:78`), dims 1D/2D/3D (`:60-62`).
+- Hybrid semantics: [`src/hybrids.c`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/hybrids.c) — `xc_hyb_init_hybrid` (`:13-17`: scalar `alpha` → `cam_alpha`, `omega=0`, i.e. global hybrid), CAM setters (`:38-58`: `cam_omega/alpha/beta`), `xc_hyb_exx_coef` (`:64-67` returns `cam_alpha`); local-hybrid `HYB_LC`/`HYB_LCY` gating (`:22-27`) with zero registrations setting those bits at this pin (verified by parse of all 709 info structs).
+- Registration census: [`src/funcs_key.c`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/funcs_key.c) (730 lines; 725 `{"name", id}` entries over 709 unique ids; e.g. `{"lda_c_1d_csc", 18}` (`:22`), `{"hyb_gga_xc_bhlyp", 436}` (`:416`)); id defines in [`src/xc_funcs.h`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/xc_funcs.h) (e.g. `XC_GGA_X_MPW91 119` (`:119`), `XC_GGA_X_WPBEH 524` (`:491`), `XC_HYB_MGGA_XC_TPSS1KCIS 569` (`:536`)).
+- KCIS hybrids are global: [`src/hyb_mgga_xc_kcis.c`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/hyb_mgga_xc_kcis.c) — scalar `exx` per variant (`:29-44`, TPSS1KCIS `exx=0.13`), `xc_mix_init` + `xc_hyb_init_hybrid(p, exx)` (`:54-55`); correlation comes from `XC_MGGA_C_KCIS` (562), not an EXX-density local mixing.
+- VV10/rVV10 tails: [`src/mgga_c_scan.c`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/mgga_c_scan.c) — `mgga_c_scan_rvv10_init` sets `nlc_b=15.7, nlc_C=0.0093` (`:44-45`), `mgga_c_scan_vv10_init` sets `nlc_b=14.0` (`:72-73`); [`src/mgga_c_scanl.c`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/mgga_c_scanl.c) (`:65-93` scanl rVV10/VV10 inits); [`src/mgga_x_vcml.c`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/mgga_x_vcml.c) — `nlc_b=15.35, nlc_C=0.0093` (`:43-44`) with `/* TBD: this should be rvv10 */` (`:56`).
+- License: [`COPYING`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/COPYING) (MPL-2.0). SymPy-tree expressions carry upstream provenance; redistribution/attribution is a packaging question, not resolved here.
+- libxckernel generation-tooling pins (never formula/physics providers): [`xckernel.inputs.ingredients`](https://github.com/susilehtola/libxckernel/blob/50aff7cfa0635e1755681715b155bc503e0b2b1f/xckernel/inputs/ingredients.py), [`xckernel.engine.spin`](https://github.com/susilehtola/libxckernel/blob/50aff7cfa0635e1755681715b155bc503e0b2b1f/xckernel/engine/spin.py), [`xckernel.engine.kernel.fock`](https://github.com/susilehtola/libxckernel/blob/50aff7cfa0635e1755681715b155bc503e0b2b1f/xckernel/engine/kernel.py) / [`xckernel.engine.spin_kernel.fock_spin`](https://github.com/susilehtola/libxckernel/blob/50aff7cfa0635e1755681715b155bc503e0b2b1f/xckernel/engine/spin_kernel.py), [`xckernel.emitters.codegen.collapse`](https://github.com/susilehtola/libxckernel/blob/50aff7cfa0635e1755681715b155bc503e0b2b1f/xckernel/emitters/codegen.py).
+- Published prerequisite ledgers (exact commit `50a04d25e2955cdd821ded58adc1b36749783064` on `research/libxc-default-oracle`): [oracle-primal-ledger.json](https://github.com/cfarm6/dftax/blob/50a04d25e2955cdd821ded58adc1b36749783064/.scratch/sympy-xc/assets/oracle-primal-ledger.json), [oracle-composites.json](https://github.com/cfarm6/dftax/blob/50a04d25e2955cdd821ded58adc1b36749783064/.scratch/sympy-xc/assets/oracle-composites.json), [oracle-primal-report.md](https://github.com/cfarm6/dftax/blob/50a04d25e2955cdd821ded58adc1b36749783064/.scratch/sympy-xc/assets/oracle-primal-report.md), [oracle-composites.md](https://github.com/cfarm6/dftax/blob/50a04d25e2955cdd821ded58adc1b36749783064/.scratch/sympy-xc/assets/oracle-composites.md), [oracle-build-pinned.md](https://github.com/cfarm6/dftax/blob/50a04d25e2955cdd821ded58adc1b36749783064/.scratch/sympy-xc/assets/oracle-build-pinned.md).
 
 ## Reconciliation
 
-709 registered identities, 725 key names (16 alias-only names, e.g. `lda_c_1d_csc`→18, `hyb_gga_xc_bhlyp`/`hyb_gga_xc_opb3lyp`→436), 709 unique ids. 555 primal + 154 worker-less composites (`cls=mix_only`, spins resolved via composites). 1094/1096 energy spin records fully bound; 7 potential-only identities (14 spin records) have no epsilon by construction; 1 spline-opaque identity (CASE21, 2 spin records) retains a genuine `params` leaf. Machine inventory: `whole-catalog-inventory.json` (709 rows, explicit ids/names/aliases/flags/thresholds/modules). Repro: `python3 whole-catalog-smoke.py whole-catalog-inventory.json` (asserts 709 unique + prints group census). Oracle smoke: isolated-env `pylibxc` CAM/VV10 readback (command in §Oracle smoke).
+709 registered identities, 725 key names (16 alias-only names, e.g. `lda_c_1d_csc`→18, `hyb_gga_xc_bhlyp`/`hyb_gga_xc_opb3lyp`→436), 709 unique ids. 555 primal + 154 worker-less composites (`cls=mix_only`, spins resolved via composites). 1094/1096 energy spin records fully bound; 7 potential-only identities (14 spin records) have no epsilon by construction; 1 spline-opaque identity (CASE21, 2 spin records) retains a genuine `params` leaf. Machine inventory: `whole-catalog-inventory.json` (709 rows). Each row carries: id/name/aliases, family/kind/cls, dimension flag + oracle `dim_source_au`, `dens_threshold`, tau/Laplacian/CAM/CAMY/VV10/DEVELOPMENT/FHC booleans, `nonlocal_kernel` (vv10 vs rvv10 by name), per-spin energy status (`energy_spin1/2`), `source_only_clean`/`proof_complete`, primal `runtime_cam`/`runtime_hyb_exx`, and composite `aux_operators` (per-spin cam/nlc/hyb_exx + aux component ids/names/weights + mix coefs; null for non-composites). Generation is fresh enumeration from pinned inputs — see §Reproduction.
+
+## Reproduction (fresh generation, not a self-check)
+
+`whole-catalog-inventory.py` freshly parses all `src/*.c` info structs at the pin, joins oracle outcomes/readbacks, and writes the inventory; `whole-catalog-smoke.py` asserts 709 unique ids and prints the group census:
+
+```bash
+git -C /tmp/libxcsrc/libxc rev-parse HEAD  # must print 7d236789c2a4521270eeaa41d06e0d721ef56abd
+cd .scratch/sympy-xc/assets
+python3 whole-catalog-inventory.py \
+  --src /tmp/libxcsrc/libxc/src \
+  --ledger /home/carson/dftax/.scratch/sympy-xc/assets/oracle-primal-ledger.json \
+  --composites /home/carson/dftax/.scratch/sympy-xc/assets/oracle-composites.json \
+  --out whole-catalog-inventory.json
+python3 whole-catalog-smoke.py whole-catalog-inventory.json
+```
+
+Observed: `RECONCILED 709/709`, group census matching §Reconciliation, smoke exit 0. Regeneration via the committed generator reproduces the committed group census exactly (verified before commit).
 
 ## Capability groups (affected ids; names in inventory rows)
 
-- Semilocal 3D energy-defined (383): LDA/GGA/MGGA, non-hybrid, non-VV10, non-kinetic, no Laplacian. Local JAX path exists in principle (rho/sigma/tau + libxckernel `lda,gga,mgga_tau,mgga_lapl,mgga` contraction families). Blockers per-row only (defaults all bound; thresholds per-row).
+- Semilocal 3D energy-defined (383): LDA/GGA/MGGA, non-hybrid, non-VV10, non-kinetic, no Laplacian; full id list in `groups.semilocal_3d_energy`. Local JAX path exists in principle (rho/sigma/tau + libxckernel `lda,gga,mgga_tau,mgga_lapl,mgga` contraction families). Blockers per-row only (defaults all bound; thresholds per-row).
 - Laplacian-needing (47): 42,72,206,207,208,209,210,211,214,220,229,230,243,256,284,319,397,398,543,564,586,598,602,617,618,621,627,628,629,630,631,632,634,686,687,688,689,690,691,700,701,702,718,719,777,778,779. Native dftax has no Laplacian seam on any grid mode (scout: `dftax/energy/gto.py` values+first-grad only; `potentials.py:44-45` raises). Covered by [Specify Laplacian ingredients across every XC backend](https://github.com/cfarm6/dftax/issues/10) — no new ticket proposed. Note: MGGA `lapl_syms` plumbing ≠ dependence (r2SCAN carries `la` structurally but `free=[gaa,na,ta]`); KXC/LXC-only Laplacian rows and `mgga_x_sa_tpss` (542, sole ENFORCE_FHC) need per-row attention at conversion.
-- Global hybrids (109): scalar exact-exchange fractions, no CAM/CAMY. Native `hf_coeff` seam exists; per-registration fractions/coefficients unresolved here. Includes 390 CASE21 (spline-opaque, see below).
+- Global hybrids (109): scalar exact-exchange fractions, no CAM/CAMY; full list in `groups.global_hybrid`. Per [Decide libxckernel's role in JAX XC](https://github.com/cfarm6/dftax/issues/6), exact exchange stays host-owned. Native `hf_coeff` seam exists; per-registration fractions/coefficients unresolved here. Includes 390 CASE21 (spline-opaque, see below).
 - Range-separated erf CAM (59): 81,178,248,297,304,310,385,395,399,400,427,428,429,430,431,432,433,434,463,464,465,466,469,471,473,478,479,480,481,482,486,487,488,489,490,491,492,531,589,610,614,615,625,636,637,639,640,646,647,653,656,658,662,681,705,706,720,771,775. Native erf-omega RSH exists. Per-registration (omega,alpha,beta) + attenuated-tensor coverage is a design question — genuinely new (see decision questions). Five HSE-family rows (427,428,478,479,480) carry spelled-out `I_HAVE_*` instead of `MAPLE2C_FLAGS`; threshold correction 1e-15 noted in catalog audit.
 - Yukawa CAMY (6): 455,467,468,470,588,682. No native Yukawa counterpart (scout §4). New decision question (unified attenuated-exchange design vs exclusion with reason).
 - Nonlocal VV10/rVV10 tails (13): 254,255,292,466,469,531,584,585,652,658,703,704,771. Native VV10 supports only (b,c)-VV10, materialized-grid only (`dftax/energy/vv10.py`, `ks/energy.py:811-818` guard). rVV10 kernel rows (292,652,703) have no native kernel; `nlc_b/nlc_C` per-row values recorded in composites (e.g. scan_rvv10 b=15.7/C=0.0093 vs scan_vv10 b=14.0). New decision question.
-- Kinetic (69): all `kind=KINETIC` (5 LDA + 51 GGA + 13 MGGA). No native KE registry/branch. No class excluded by this audit; support vs explicit-unsupported is a human decision. New decision question (kept distinct from potential-only ticket).
+- Kinetic (69): all `kind=KINETIC` (5 LDA + 51 GGA + 13 MGGA); full list in `groups.kinetic`. No native KE registry/branch. No class excluded by this audit; support vs explicit-unsupported is a human decision. New decision question (kept distinct from potential-only ticket).
 - Non-3D (17): 1D (18,21,26,536,537,538,600) + 2D (15,16,19,124,127,128,129,210,211,609). Native is 3D-molecular only. Dimensional contract (ingredient scaling, grid/AO support, oracle comparability) is a new decision question.
 - DEVELOPMENT (13): 33,210,211,225,230,243,472,590,686,688,695,696,697. Upstream-stability caveat, not a technical blocker finding.
 - Potential-only, no scalar energy (7): 160 `gga_x_lb`, 182 `gga_x_lbm`, 207 `mgga_x_bj06`, 208 `mgga_x_tb09`, 209 `mgga_x_rpp09`, 211 `mgga_x_2d_prhg07_prp10`, 599 `lda_xc_tih`. Covered by [Decide capabilities for Libxc entries without scalar energies](https://github.com/cfarm6/dftax/issues/15) — no new ticket proposed.
-- Spline-opaque CASE21 (1): 390 `hyb_gga_xc_case21`. Only identity with genuine `params` leaf; initialized spline degree/basis/knots/coefficients recorded in oracle, no numeric-default fabrication. Covered by [Choose differentiable JAX spline artifacts for CASE21](https://github.com/cfarm6/dftax/issues/16) — no new ticket proposed.
-- Composite-only (154): listed in inventory `composites_mix_only`; resolved via initialized composite readbacks (812 slots), not source formulas. Covered by [Specify Libxc registration and composition](https://github.com/cfarm6/dftax/issues/9) — no new ticket proposed.
+- Spline-opaque CASE21 (1): 390 `hyb_gga_xc_case21` (`runtime_cam=[0.0,0.25,0.0]`, `runtime_hyb_exx=0.25`). Only identity with genuine `params` leaf; initialized spline degree/basis/knots/coefficients recorded in oracle, no numeric-default fabrication. Covered by [Choose differentiable JAX spline artifacts for CASE21](https://github.com/cfarm6/dftax/issues/16) — no new ticket proposed.
+- Composite-only (154): full list in `groups.composites_mix_only`; resolved via initialized composite readbacks (812 slots), not source formulas. Per-composite `aux_operators` propagate parent-level cam/nlc/hyb_exx plus aux component ids/names/weights and mix coefs (e.g. 428 hse06 cam=[0.11,0.0,0.25] over `gga_x_wpbeh,gga_x_wpbeh,gga_c_pbe`; 292 scan_rvv10 nlc=[15.7,0.0093] over `mgga_c_scan`; 255 vv10 nlc=[5.9,0.0093]). Covered by [Specify Libxc registration and composition](https://github.com/cfarm6/dftax/issues/9) — no new ticket proposed.
 - Threshold quirk: 47 `gga_c_q2d` struct 0.0 vs computed fallback; HSE-family 1e-15 corrections — conversion-design inputs.
 
 ## Explicitly verified non-findings (evidence, not repetition)
 
-- Zero local-hybrid (NEEDS_EXX-density) entries at this pin: no `XC_FLAGS_HYB_LC/LCY` token appears in any of the 709 info structs (`hybrids.c` machinery exists but no registration sets it); KCIS hybrids (566–569) are global hybrids (scalar `exx` 0.13–0.41) + KCIS correlation. Scout's "M08/M11/MN need EXX-density" identification is therefore not reproduced — those families are global/RSH at this pin. No local-hybrid decision ticket is proposed; if a future pin adds `HYB_LC`, that reopens the question.
+- Zero local-hybrid (EXX-density) entries at this pin: no `XC_FLAGS_HYB_LC/LCY` token appears in any of the 709 info structs ([`src/xc.h`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/xc.h) defines the bits at `:69-71`; [`src/hybrids.c`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/hybrids.c) gates on them at `:22-27` but no registration sets them); KCIS hybrids (566–569) are global hybrids (scalar `exx` 0.13–0.41 per [`src/hyb_mgga_xc_kcis.c:29-55`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/hyb_mgga_xc_kcis.c)) + KCIS correlation. Scout's "M08/M11/MN need EXX-density" identification is therefore not reproduced — those families are global/RSH at this pin. No local-hybrid decision ticket is proposed; if a future pin adds `HYB_LC`, that reopens the question.
 - M08/M11/MN12-SX rows are global or erf-CAM (e.g. 248 `hyb_mgga_x_mn12_sx` is HYB_CAM), not local hybrids.
-- `STABLE` flag: 0 rows. `ON_HOST/ON_DEVICE`: 44 each, infra-only.
+- `STABLE` flag: 0 rows. `ON_HOST/ON_DEVICE`: infra-only.
 - `lda_c_1d_css` (18): table readback fills 10/20 params per spin (not source defaults); `gga_xc_opbe_d` (65) DEFAULT-slot and `gga_xc_kt3` (587) computed-coefficient fills resolved by oracle — prior `B-oracle` markers superseded.
 
 ## Oracle smoke
@@ -47,15 +76,7 @@ f=pylibxc.LibXCFunctional('hyb_gga_xc_hse06',1); print('hse06 cam:', f.get_cam_c
 g=pylibxc.LibXCFunctional('mgga_c_scan_rvv10',1); print('scan_rvv10 vv10:', g.get_vv10_coef());"
 ```
 
-Observed: `hse06 cam: (0.11, 0.0, 0.25)`; `scan_rvv10 vv10: (15.7, 0.0093)`. Confirms CAM + rVV10 tails are live host-physics parameters the JAX backend must plan for, not formula content.
-
-## Inventory smoke
-
-```bash
-cd .scratch/sympy-xc/assets && python3 whole-catalog-smoke.py whole-catalog-inventory.json
-```
-
-Observed: `identities=709 unique=709 names=725 primal=555 mix_only=154` + per-group census matching §Reconciliation. Exit 0.
+Observed: `hse06 cam: (0.11, 0.0, 0.25)`; `scan_rvv10 vv10: (15.7, 0.0093)`. Confirms CAM + rVV10 tails are live host-physics parameters the JAX backend must plan for, not formula content. Source counterparts: [`src/mgga_c_scan.c:44-45,72-73`](https://gitlab.com/libxc/libxc/-/blob/7d236789c2a4521270eeaa41d06e0d721ef56abd/src/mgga_c_scan.c).
 
 ## Resolution draft (factual, no policy)
 
