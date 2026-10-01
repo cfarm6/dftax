@@ -1,0 +1,5151 @@
+# Composite oracle readback (initialized aux, per identity)
+
+- pin `7d236789c2a4521270eeaa41d06e0d721ef56abd`; effective EXT params read per aux slot via `xc_func_get_info`/`xc_func_info_get_n_ext_params`+`_name`/`xc_func_get_ext_params_value` (`src/xc.h:418-425`, `src/functionals.c:516-574`) on the initialized parent's `func_aux` pointers; standalone baseline of same spin via the same API (overridden/at_default are EXT-level).
+- internal `params` struct readback (via `build_info._c_struct_layout`) retained only for computed/setter-derived slots; NOPARAMS-FILE marks parameterless components, AMBI marks multi-struct files refused for struct read.
+- source side: each identity's OWN init-fn body in `src/<file>` (body-scoped ids/coefs/aux; no file-level array reuse, no sibling-branch defaults).
+- worker-less identities: 154; records: 308 (spins 1+2); ok: 308; init errors: 0; naux==0: 0; slots: 812 complete: 254 partial: 558; with discrepancy: 0.
+- cmp classes: complete:{full-match, lead-slots-match+N-DEFAULT-filled, setter-mapped(runtime-authoritative)}; partial:{no-source-aux, no-comparable-readback, unresolved-source-tokens, ext-shorter-than-source}. Zero discrepancies means no observed mismatch on compared slots, NOT full reconciliation of partial slots.
+- repro: `cd /tmp/libxcsrc/libxc && SP=/tmp/xcoracle-po/cpython-3.13-linux-x86_64-gnu/lib/python3.13/site-packages && LD_LIBRARY_PATH=/tmp/xcoracle-po/lib PYTHONPATH=/tmp/libxcsrc/libxc/scripts/sympy2c:/tmp/sympyenv:$SP /tmp/xcoracle-po/venv/bin/python /home/carson/dftax/.scratch/sympy-xc/assets/oracle-composites.py` (oracle env per `.scratch/sympy-xc/assets/oracle-build-pinned.md`; script is self-contained, no /tmp inputs needed).
+
+## focus id 65
+- spin 1 gga_xc_opbe_d init=gga_xc_opbe_d_init file=gga_xc_oblyp_d.c aux=[('gga_x_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0]
+  source: {"init": "gga_xc_opbe_d_init", "ids": [101, 130], "coefs": [1.0, 1.0], "aux": {"0": [1.201, 0.21198], "1": [0.04636, "DEFAULT", "DEFAULT", "DEFAULT"]}, "notes": []}
+  slot0 gga_x_pbe ext_effective={"names": ["_kappa", "_mu"], "values": [1.201, 0.21198]} ext_overridden=['_kappa', '_mu'] cmp=complete:full-match
+  slot1 gga_c_pbe ext_effective={"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.04636, 0.031090690869654894, 1.0, 1.0]} ext_overridden=['_beta'] cmp=complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+  discrepancy: NONE (on compared slots only; see cmp classes)
+- spin 2 gga_xc_opbe_d init=gga_xc_opbe_d_init file=gga_xc_oblyp_d.c aux=[('gga_x_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0]
+  source: {"init": "gga_xc_opbe_d_init", "ids": [101, 130], "coefs": [1.0, 1.0], "aux": {"0": [1.201, 0.21198], "1": [0.04636, "DEFAULT", "DEFAULT", "DEFAULT"]}, "notes": []}
+  slot0 gga_x_pbe ext_effective={"names": ["_kappa", "_mu"], "values": [1.201, 0.21198]} ext_overridden=['_kappa', '_mu'] cmp=complete:full-match
+  slot1 gga_c_pbe ext_effective={"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.04636, 0.031090690869654894, 1.0, 1.0]} ext_overridden=['_beta'] cmp=complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+  discrepancy: NONE (on compared slots only; see cmp classes)
+## focus id 587
+- spin 1 gga_xc_kt3 init=gga_xc_kt3_init file=gga_x_kt.c aux=[('lda_x', -0.5877016340967667), ('gga_c_lyp', 0.864409), ('gga_x_kt1', 1.0), ('gga_x_optx', 0.6464052972361336)] mix=[-0.5877016340967667, 0.864409, 1.0, 0.6464052972361336]
+  source: {"init": "gga_xc_kt3_init", "ids": [1, 131, 145, 110], "coefs": [-0.5877016340967667, 0.864409, 1.0, 0.6464052972361336], "aux": {"2": [-0.004, 0.1]}, "notes": []}
+  slot0 lda_x ext_effective={"names": [], "values": []} ext_overridden=[] cmp=complete:parameterless (no EXT params, no source aux)
+  slot1 gga_c_lyp ext_effective={"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} ext_overridden=[] cmp=partial:no-source-aux
+  slot2 gga_x_kt1 ext_effective={"names": ["_gamma", "_delta"], "values": [-0.004, 0.1]} ext_overridden=['_gamma'] cmp=complete:full-match
+  slot3 gga_x_optx ext_effective={"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} ext_overridden=[] cmp=partial:no-source-aux
+  discrepancy: NONE (on compared slots only; see cmp classes)
+- spin 2 gga_xc_kt3 init=gga_xc_kt3_init file=gga_x_kt.c aux=[('lda_x', -0.5877016340967667), ('gga_c_lyp', 0.864409), ('gga_x_kt1', 1.0), ('gga_x_optx', 0.6464052972361336)] mix=[-0.5877016340967667, 0.864409, 1.0, 0.6464052972361336]
+  source: {"init": "gga_xc_kt3_init", "ids": [1, 131, 145, 110], "coefs": [-0.5877016340967667, 0.864409, 1.0, 0.6464052972361336], "aux": {"2": [-0.004, 0.1]}, "notes": []}
+  slot0 lda_x ext_effective={"names": [], "values": []} ext_overridden=[] cmp=complete:parameterless (no EXT params, no source aux)
+  slot1 gga_c_lyp ext_effective={"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} ext_overridden=[] cmp=partial:no-source-aux
+  slot2 gga_x_kt1 ext_effective={"names": ["_gamma", "_delta"], "values": [-0.004, 0.1]} ext_overridden=['_gamma'] cmp=complete:full-match
+  slot3 gga_x_optx ext_effective={"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} ext_overridden=[] cmp=partial:no-source-aux
+  discrepancy: NONE (on compared slots only; see cmp classes)
+
+## nonlocal tails (parent-level, separate from semilocal aux)
+- 104 hyb_lda_xc_b93 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5 aux=['lda_x', 'lda_c_pw_mod']
+- 177 hyb_lda_xc_lda0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['lda_x', 'lda_c_pw_mod']
+- 178 hyb_lda_xc_cam_lda0 cam=[0.3333333333333333, 0.5, -0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['lda_x', 'lda_x_erf', 'lda_c_pw_mod']
+- 224 hyb_mgga_x_ms2h cam=[0.0, 0.09, 0.0] nlc=[0.0, 0.0] hyb_exx=0.09 aux=['mgga_x_ms2']
+- 255 gga_xc_vv10 cam=[0.0, 0.0, 0.0] nlc=[5.9, 0.0093] hyb_exx=None aux=['gga_x_rpw86', 'gga_c_pbe']
+- 264 hyb_mgga_x_scan0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['mgga_x_scan']
+- 273 hyb_gga_xc_pbe_mol0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_pbe_mol', 'gga_c_pbe_mol']
+- 274 hyb_gga_xc_pbe_sol0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_pbe_sol', 'gga_c_pbe_sol']
+- 275 hyb_gga_xc_pbeb0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_pbe', 'gga_c_pbe']
+- 276 hyb_gga_xc_pbe_molb0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_pbe_mol', 'gga_c_pbe']
+- 290 hyb_gga_xc_pbe50 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5 aux=['gga_x_pbe', 'gga_c_pbe']
+- 292 mgga_c_scan_rvv10 cam=[0.0, 0.0, 0.0] nlc=[15.7, 0.0093] hyb_exx=None aux=['mgga_c_scan']
+- 314 hyb_gga_xc_hflyp cam=[0.0, 1.0, 0.0] nlc=[0.0, 0.0] hyb_exx=1.0 aux=['gga_c_lyp']
+- 315 hyb_gga_xc_b3p86_nwchem cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_p86', 'lda_c_pz']
+- 325 hyb_gga_xc_relpbe0 cam=[0.0, 0.2311865490779869, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2311865490779869 aux=['gga_x_pbe', 'gga_c_pbe', 'lda_c_pw_mod']
+- 385 hyb_gga_xc_cqtp25 cam=[0.4153, 1.0, -0.4948] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 389 hyb_mgga_xc_br3p86 cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22 aux=['lda_x', 'mgga_x_br89_1', 'lda_c_vwn', 'gga_c_p86vwn']
+- 392 hyb_gga_xc_pbe_2x cam=[0.0, 0.56, 0.0] nlc=[0.0, 0.0] hyb_exx=0.56 aux=['gga_x_pbe', 'gga_c_pbe']
+- 393 hyb_gga_xc_pbe38 cam=[0.0, 0.375, 0.0] nlc=[0.0, 0.0] hyb_exx=0.375 aux=['gga_x_pbe', 'gga_c_pbe']
+- 394 hyb_gga_xc_b3lyp3 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_3', 'gga_c_lyp']
+- 395 hyb_gga_xc_cam_o3lyp cam=[0.33, 0.8, -0.6839000000000001] nlc=[0.0, 0.0] hyb_exx=None aux=['lda_x_erf', 'gga_x_ityh_optx', 'lda_c_vwn', 'gga_c_lyp']
+- 396 hyb_mgga_xc_tpss0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['mgga_x_tpss', 'mgga_c_tpss']
+- 398 hyb_mgga_xc_b94_hyb cam=[0.0, 0.154, 0.0] nlc=[0.0, 0.0] hyb_exx=0.154 aux=['mgga_x_br89', 'mgga_c_b94']
+- 400 hyb_gga_xc_lc_blyp cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_ityh', 'gga_c_lyp']
+- 401 hyb_gga_xc_b3pw91 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_b88', 'lda_c_pw', 'gga_c_pw91']
+- 402 hyb_gga_xc_b3lyp cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 403 hyb_gga_xc_b3p86 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_p86']
+- 404 hyb_gga_xc_o3lyp cam=[0.0, 0.1161, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1161 aux=['lda_x', 'gga_x_optx', 'lda_c_vwn', 'gga_c_lyp']
+- 405 hyb_gga_xc_mpw1k cam=[0.0, 0.428, 0.0] nlc=[0.0, 0.0] hyb_exx=0.428 aux=['gga_x_mpw91', 'gga_c_pw91']
+- 406 hyb_gga_xc_pbeh cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_pbe', 'gga_c_pbe']
+- 409 hyb_gga_xc_apf cam=[0.0, 0.22945, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22945 aux=['lda_x', 'gga_x_b88', 'lda_c_pw', 'gga_c_pw91', 'gga_x_pbe', 'gga_c_pbe']
+- 411 hyb_gga_xc_x3lyp cam=[0.0, 0.218, 0.0] nlc=[0.0, 0.0] hyb_exx=0.218 aux=['lda_x', 'gga_x_b88', 'gga_x_pw91', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 412 hyb_gga_xc_b1wc cam=[0.0, 0.16, 0.0] nlc=[0.0, 0.0] hyb_exx=0.16 aux=['gga_x_wc', 'gga_c_pbe']
+- 415 hyb_gga_xc_mpw3pw cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_mpw91', 'lda_c_vwn_rpa', 'gga_c_pw91']
+- 416 hyb_gga_xc_b1lyp cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_b88', 'gga_c_lyp']
+- 417 hyb_gga_xc_b1pw91 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_b88', 'gga_c_pw91']
+- 418 hyb_gga_xc_mpw1pw cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_mpw91', 'gga_c_pw91']
+- 419 hyb_gga_xc_mpw3lyp cam=[0.0, 0.218, 0.0] nlc=[0.0, 0.0] hyb_exx=0.218 aux=['lda_x', 'gga_x_mpw91', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 427 hyb_gga_xc_hse03 cam=[0.10606601717798213, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_wpbeh', 'gga_x_wpbeh', 'gga_c_pbe']
+- 428 hyb_gga_xc_hse06 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_wpbeh', 'gga_x_wpbeh', 'gga_c_pbe']
+- 429 hyb_gga_xc_hjs_pbe cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe', 'gga_x_hjs_pbe', 'gga_c_pbe']
+- 430 hyb_gga_xc_hjs_pbe_sol cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe_sol', 'gga_x_hjs_pbe_sol', 'gga_c_pbe']
+- 431 hyb_gga_xc_hjs_b88 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_b88', 'gga_x_hjs_b88', 'gga_c_pbe']
+- 432 hyb_gga_xc_hjs_b97x cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_b97x', 'gga_x_hjs_b97x', 'gga_c_pbe']
+- 433 hyb_gga_xc_cam_b3lyp cam=[0.33, 0.65, -0.46] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 434 hyb_gga_xc_tuned_cam_b3lyp cam=[0.15, 1.0, -0.9201] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 435 hyb_gga_xc_bhandh cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5 aux=['lda_x', 'gga_c_lyp']
+- 436 hyb_gga_xc_bhandhlyp cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5 aux=['gga_x_b88', 'gga_c_lyp']
+- 437 hyb_gga_xc_mb3lyp_rc04 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_b88', 'lda_c_rc04', 'gga_c_lyp']
+- 440 hyb_mgga_xc_b88b95 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28 aux=['gga_x_b88', 'mgga_c_bc95']
+- 441 hyb_mgga_xc_b86b95 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28 aux=['gga_x_b86', 'mgga_c_bc95']
+- 442 hyb_mgga_xc_pw86b95 cam=[0.0, 0.29, 0.0] nlc=[0.0, 0.0] hyb_exx=0.29 aux=['gga_x_pw86', 'mgga_c_bc95']
+- 443 hyb_mgga_xc_bb1k cam=[0.0, 0.42, 0.0] nlc=[0.0, 0.0] hyb_exx=0.42 aux=['gga_x_b88', 'mgga_c_bc95']
+- 445 hyb_mgga_xc_mpw1b95 cam=[0.0, 0.31, 0.0] nlc=[0.0, 0.0] hyb_exx=0.31 aux=['gga_x_mpw91', 'mgga_c_bc95']
+- 446 hyb_mgga_xc_mpwb1k cam=[0.0, 0.44, 0.0] nlc=[0.0, 0.0] hyb_exx=0.44 aux=['gga_x_mpw91', 'mgga_c_bc95']
+- 447 hyb_mgga_xc_x1b95 cam=[0.0, 0.3, 0.0] nlc=[0.0, 0.0] hyb_exx=0.3 aux=['gga_x_b88', 'gga_x_pw91', 'mgga_c_bc95']
+- 448 hyb_mgga_xc_xb1k cam=[0.0, 0.43, 0.0] nlc=[0.0, 0.0] hyb_exx=0.43 aux=['gga_x_b88', 'gga_x_pw91', 'mgga_c_bc95']
+- 451 hyb_mgga_xc_pw6b95 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28 aux=['gga_x_mpw91', 'mgga_c_bc95']
+- 452 hyb_mgga_xc_pwb6k cam=[0.0, 0.46, 0.0] nlc=[0.0, 0.0] hyb_exx=0.46 aux=['gga_x_mpw91', 'mgga_c_bc95']
+- 453 hyb_gga_xc_mpwlyp1m cam=[0.0, 0.05, 0.0] nlc=[0.0, 0.0] hyb_exx=0.05 aux=['gga_x_mpw91', 'gga_c_lyp']
+- 454 hyb_gga_xc_revb3lyp cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 455 hyb_gga_xc_camy_blyp cam=[0.44, 1.0, -0.8] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_sfat', 'gga_c_lyp']
+- 456 hyb_gga_xc_pbe0_13 cam=[0.0, 0.3333333333333333, 0.0] nlc=[0.0, 0.0] hyb_exx=0.3333333333333333 aux=['gga_x_pbe', 'gga_c_pbe']
+- 457 hyb_mgga_xc_tpssh cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1 aux=['mgga_x_tpss', 'mgga_c_tpss']
+- 458 hyb_mgga_xc_revtpssh cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1 aux=['mgga_x_revtpss', 'mgga_c_revtpss']
+- 459 hyb_gga_xc_b3lyps cam=[0.0, 0.15, 0.0] nlc=[0.0, 0.0] hyb_exx=0.15 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 460 hyb_gga_xc_qtp17 cam=[0.0, 0.62, 0.0] nlc=[0.0, 0.0] hyb_exx=0.62 aux=['lda_x', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 461 hyb_gga_xc_b3lyp_mcm1 cam=[0.0, 0.1986, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1986 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 462 hyb_gga_xc_b3lyp_mcm2 cam=[0.0, 0.2228, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2228 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 465 hyb_gga_xc_lrc_wpbeh cam=[0.2, 1.0, -0.8] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe', 'gga_c_pbe']
+- 467 hyb_gga_xc_lcy_pbe cam=[0.75, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_sfat_pbe', 'gga_c_pbe']
+- 468 hyb_gga_xc_lcy_blyp cam=[0.75, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_sfat', 'gga_c_lyp']
+- 469 hyb_gga_xc_lc_vv10 cam=[0.45, 1.0, -1.0] nlc=[6.3, 0.0089] hyb_exx=None aux=['gga_x_hjs_pbe', 'gga_c_pbe']
+- 470 hyb_gga_xc_camy_b3lyp cam=[0.34, 0.65, -0.46] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_sfat', 'lda_c_vwn', 'gga_c_lyp']
+- 472 hyb_gga_xc_hpbeint cam=[0.0, 0.16666666666666666, 0.0] nlc=[0.0, 0.0] hyb_exx=0.16666666666666666 aux=['gga_x_pbeint', 'gga_c_pbeint']
+- 473 hyb_gga_xc_lrc_wpbe cam=[0.3, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe', 'gga_c_pbe']
+- 474 hyb_mgga_x_mvsh cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['mgga_x_mvs']
+- 475 hyb_gga_xc_b3lyp5 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn', 'gga_c_lyp']
+- 476 hyb_gga_xc_edf2 cam=[0.0, 0.1695, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1695 aux=['lda_x', 'gga_x_b88', 'gga_x_b88', 'lda_c_vwn', 'gga_c_lyp', 'gga_c_lyp']
+- 477 hyb_gga_xc_cap0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_cap', 'gga_c_pbe']
+- 478 hyb_gga_xc_lc_wpbe cam=[0.4, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_wpbeh', 'gga_c_pbe']
+- 479 hyb_gga_xc_hse12 cam=[0.0978977840165, 0.0, 0.313] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_wpbeh', 'gga_x_wpbeh', 'gga_c_pbe']
+- 480 hyb_gga_xc_hse12s cam=[0.2159043020472, 0.0, 0.425] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_wpbeh', 'gga_x_wpbeh', 'gga_c_pbe']
+- 481 hyb_gga_xc_hse_sol cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe_sol', 'gga_x_hjs_pbe_sol', 'gga_c_pbe']
+- 482 hyb_gga_xc_cam_qtp_01 cam=[0.31, 1.0, -0.77] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 483 hyb_gga_xc_mpw1lyp cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_mpw91', 'gga_c_lyp']
+- 484 hyb_gga_xc_mpw1pbe cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_mpw91', 'gga_c_pbe']
+- 485 hyb_gga_xc_kmlyp cam=[0.0, 0.557, 0.0] nlc=[0.0, 0.0] hyb_exx=0.557 aux=['lda_x', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 486 hyb_gga_xc_lc_wpbe_whs cam=[0.4, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe', 'gga_c_pbe']
+- 487 hyb_gga_xc_lc_wpbeh_whs cam=[0.4, 1.0, -0.75] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe', 'gga_c_pbe']
+- 488 hyb_gga_xc_lc_wpbe08_whs cam=[0.45, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe', 'gga_c_pbe']
+- 489 hyb_gga_xc_lc_wpbesol_whs cam=[0.6, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe_sol', 'gga_c_pbe_sol']
+- 490 hyb_gga_xc_cam_qtp_00 cam=[0.29, 0.91, -0.37] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 491 hyb_gga_xc_cam_qtp_02 cam=[0.335, 1.0, -0.72] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 492 hyb_gga_xc_lc_qtp cam=[0.475, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 499 hyb_gga_xc_blyp35 cam=[0.0, 0.35, 0.0] nlc=[0.0, 0.0] hyb_exx=0.35 aux=['gga_x_b88', 'gga_c_lyp']
+- 563 hyb_mgga_xc_b0kcis cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_b88', 'mgga_c_kcis']
+- 566 hyb_mgga_xc_mpw1kcis cam=[0.0, 0.15, 0.0] nlc=[0.0, 0.0] hyb_exx=0.15 aux=['gga_x_mpw91', 'mgga_c_kcis']
+- 567 hyb_mgga_xc_mpwkcis1k cam=[0.0, 0.41, 0.0] nlc=[0.0, 0.0] hyb_exx=0.41 aux=['gga_x_mpw91', 'mgga_c_kcis']
+- 568 hyb_mgga_xc_pbe1kcis cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22 aux=['gga_x_pbe', 'mgga_c_kcis']
+- 569 hyb_mgga_xc_tpss1kcis cam=[0.0, 0.13, 0.0] nlc=[0.0, 0.0] hyb_exx=0.13 aux=['mgga_x_tpss', 'mgga_c_kcis']
+- 572 hyb_gga_xc_b5050lyp cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn', 'gga_c_lyp']
+- 583 hyb_mgga_x_revscan0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['mgga_x_revscan']
+- 584 mgga_c_scan_vv10 cam=[0.0, 0.0, 0.0] nlc=[14.0, 0.0093] hyb_exx=None aux=['mgga_c_scan']
+- 585 mgga_c_revscan_vv10 cam=[0.0, 0.0, 0.0] nlc=[9.8, 0.0093] hyb_exx=None aux=['mgga_c_revscan']
+- 589 hyb_gga_xc_lb07 cam=[0.5, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['lda_x_erf', 'gga_c_lyp']
+- 607 hyb_gga_xc_apbe0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['gga_x_apbe', 'gga_c_apbe']
+- 608 hyb_gga_xc_hapbe cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2 aux=['gga_x_apbe', 'gga_c_apbe', 'gga_c_zvpbeloc']
+- 610 hyb_gga_xc_rcam_b3lyp cam=[0.33, 1.13331, -0.94979] nlc=[0.0, 0.0] hyb_exx=None aux=['lda_x', 'gga_x_b88', 'gga_x_ityh', 'gga_c_lyp']
+- 611 hyb_gga_xc_wc04 cam=[0.0, 0.74, 0.0] nlc=[0.0, 0.0] hyb_exx=0.74 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 612 hyb_gga_xc_wp04 cam=[0.0, 0.1189, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1189 aux=['lda_x', 'gga_x_b88', 'lda_c_vwn_rpa', 'gga_c_lyp']
+- 614 hyb_gga_xc_camh_b3lyp cam=[0.33, 0.5, -0.31] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 615 hyb_gga_xc_whpbe0 cam=[0.2, 0.5, -0.25] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_hjs_pbe', 'gga_c_pbe']
+- 625 hyb_gga_xc_lc_blyp_ea cam=[0.3, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_ityh', 'gga_c_lyp']
+- 636 hyb_gga_xc_lc_bop cam=[0.47, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_ityh', 'gga_c_op_b88']
+- 637 hyb_gga_xc_lc_pbeop cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_ityh_pbe', 'gga_c_op_pbe']
+- 639 hyb_gga_xc_lc_blypr cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_ityh', 'gga_c_lypr']
+- 640 hyb_gga_xc_mcam_b3lyp cam=[0.33, 0.38, -0.19] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_b88', 'gga_x_ityh', 'lda_c_vwn', 'gga_c_lyp']
+- 652 mgga_xc_vcml_rvv10 cam=[0.0, 0.0, 0.0] nlc=[15.35, 0.0093] hyb_exx=None aux=['mgga_x_vcml', 'gga_c_regtpss']
+- 659 hyb_mgga_xc_r2scanh cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1 aux=['mgga_x_r2scan', 'mgga_c_r2scan']
+- 660 hyb_mgga_xc_r2scan0 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25 aux=['mgga_x_r2scan', 'mgga_c_r2scan']
+- 661 hyb_mgga_xc_r2scan50 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5 aux=['mgga_x_r2scan', 'mgga_c_r2scan']
+- 681 hyb_gga_xc_cam_pbeh cam=[0.7, 0.2, 0.8] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_pbe', 'gga_x_hjs_pbe', 'gga_c_pbe']
+- 682 hyb_gga_xc_camy_pbeh cam=[0.7, 0.2, 0.8] nlc=[0.0, 0.0] hyb_exx=None aux=['gga_x_pbe', 'gga_x_sfat', 'gga_c_pbe']
+- 695 hyb_mgga_xc_edmggah cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22 aux=['mgga_x_edmgga', 'mgga_c_cs']
+- 703 mgga_c_scanl_rvv10 cam=[0.0, 0.0, 0.0] nlc=[15.7, 0.0093] hyb_exx=None aux=['mgga_c_scanl']
+- 704 mgga_c_scanl_vv10 cam=[0.0, 0.0, 0.0] nlc=[14.0, 0.0093] hyb_exx=None aux=['mgga_c_scanl']
+- 720 hyb_mgga_xc_lc_tmlyp cam=[0.28, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None aux=['hyb_mgga_x_pjs18', 'gga_c_lyp']
+
+## all rows (compact)
+### 64 mgga_xc_otpss_d spin=1 init=mgga_xc_otpss_d_init file=mgga_xc_otpss_d.c
+- aux=[('mgga_x_tpss', 1.0), ('mgga_c_tpss', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[202, 231] source-coefs=[1.0, 1.0] source-aux={"0": [3.43, 0.75896, 0.165, 0.778, 0.41567, 2.0, 0.0], "1": [0.08861, 0.7, 0.53, 0.87, 0.5, 2.26]} notes=[]
+- slot0 202 mgga_x_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 3.43, "c": 0.75896, "e": 0.165, "kappa": 0.778, "tpss_mu": 0.41567}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [3.43, 0.75896, 0.165, 0.778, 0.41567]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=['_b', '_c', '_e', '_kappa', '_mu'] at_default=[]
+  - cmp: complete:lead-5-match+trailing-source-beyond-ext-n-ignored
+- slot1 231 mgga_c_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.08861, "d": 0.7, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.08861, 0.7, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=['_beta', '_d'] at_default=['_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: complete:full-match
+### 64 mgga_xc_otpss_d spin=2 init=mgga_xc_otpss_d_init file=mgga_xc_otpss_d.c
+- aux=[('mgga_x_tpss', 1.0), ('mgga_c_tpss', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[202, 231] source-coefs=[1.0, 1.0] source-aux={"0": [3.43, 0.75896, 0.165, 0.778, 0.41567, 2.0, 0.0], "1": [0.08861, 0.7, 0.53, 0.87, 0.5, 2.26]} notes=[]
+- slot0 202 mgga_x_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 3.43, "c": 0.75896, "e": 0.165, "kappa": 0.778, "tpss_mu": 0.41567}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [3.43, 0.75896, 0.165, 0.778, 0.41567]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=['_b', '_c', '_e', '_kappa', '_mu'] at_default=[]
+  - cmp: complete:lead-5-match+trailing-source-beyond-ext-n-ignored
+- slot1 231 mgga_c_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.08861, "d": 0.7, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.08861, 0.7, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=['_beta', '_d'] at_default=['_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: complete:full-match
+### 65 gga_xc_opbe_d spin=1 init=gga_xc_opbe_d_init file=gga_xc_oblyp_d.c
+- aux=[('gga_x_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 130] source-coefs=[1.0, 1.0] source-aux={"0": [1.201, 0.21198], "1": [0.04636, "DEFAULT", "DEFAULT", "DEFAULT"]} notes=[]
+- slot0 101 gga_x_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 1.201, "mu": 0.21198, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [1.201, 0.21198]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.04636, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.04636, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+### 65 gga_xc_opbe_d spin=2 init=gga_xc_opbe_d_init file=gga_xc_oblyp_d.c
+- aux=[('gga_x_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 130] source-coefs=[1.0, 1.0] source-aux={"0": [1.201, 0.21198], "1": [0.04636, "DEFAULT", "DEFAULT", "DEFAULT"]} notes=[]
+- slot0 101 gga_x_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 1.201, "mu": 0.21198, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [1.201, 0.21198]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.04636, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.04636, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+### 66 gga_xc_opwlyp_d spin=1 init=gga_xc_opwlyp_d_init file=gga_xc_oblyp_d.c
+- aux=[('gga_x_mpw91', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[119, 131] source-coefs=[1.0, 1.0] source-aux={"0": [0.00402, 54.049429419522305, 0.79], "1": [0.0496, 0.144, 0.2262, 0.346]} notes=[]
+- slot0 119 gga_x_mpw91 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.18802876680812916, "b": 7.795554179441507, "c": 0.2625376855413186, "d": -0.1390808954178619, "f": 5.44290477351557e-06, "alpha": 54.049429419522305, "expo": 0.79}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00402, 54.049429419522305, 0.79]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=['_bt', '_alpha', '_expo'] at_default=[]
+  - cmp: complete:full-match
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.0496, "b": 0.144, "c": 0.2262, "d": 0.346}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.0496, 0.144, 0.2262, 0.346]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=['_a', '_b', '_c', '_d'] at_default=[]
+  - cmp: complete:full-match
+### 66 gga_xc_opwlyp_d spin=2 init=gga_xc_opwlyp_d_init file=gga_xc_oblyp_d.c
+- aux=[('gga_x_mpw91', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[119, 131] source-coefs=[1.0, 1.0] source-aux={"0": [0.00402, 54.049429419522305, 0.79], "1": [0.0496, 0.144, 0.2262, 0.346]} notes=[]
+- slot0 119 gga_x_mpw91 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.18802876680812916, "b": 7.795554179441507, "c": 0.2625376855413186, "d": -0.1390808954178619, "f": 5.44290477351557e-06, "alpha": 54.049429419522305, "expo": 0.79}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00402, 54.049429419522305, 0.79]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=['_bt', '_alpha', '_expo'] at_default=[]
+  - cmp: complete:full-match
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.0496, "b": 0.144, "c": 0.2262, "d": 0.346}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.0496, 0.144, 0.2262, 0.346]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=['_a', '_b', '_c', '_d'] at_default=[]
+  - cmp: complete:full-match
+### 67 gga_xc_oblyp_d spin=1 init=gga_xc_oblyp_d_init file=gga_xc_oblyp_d.c
+- aux=[('gga_x_b88', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 131] source-coefs=[1.0, 1.0] source-aux={"0": [0.00401, 6.0], "1": [0.05047, 0.14, 0.2196, 0.363]} notes=[]
+- slot0 106 gga_x_b88 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.00401, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.00401, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=['_beta'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.05047, "b": 0.14, "c": 0.2196, "d": 0.363}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.05047, 0.14, 0.2196, 0.363]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=['_a', '_b', '_c', '_d'] at_default=[]
+  - cmp: complete:full-match
+### 67 gga_xc_oblyp_d spin=2 init=gga_xc_oblyp_d_init file=gga_xc_oblyp_d.c
+- aux=[('gga_x_b88', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 131] source-coefs=[1.0, 1.0] source-aux={"0": [0.00401, 6.0], "1": [0.05047, 0.14, 0.2196, 0.363]} notes=[]
+- slot0 106 gga_x_b88 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.00401, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.00401, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=['_beta'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.05047, "b": 0.14, "c": 0.2196, "d": 0.363}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.05047, 0.14, 0.2196, 0.363]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=['_a', '_b', '_c', '_d'] at_default=[]
+  - cmp: complete:full-match
+### 91 gga_x_ssb spin=1 init=gga_x_ssb_init file=gga_x_ssb_sw.c
+- aux=[('lda_x', -1.0), ('gga_x_ssb_sw', 1.0), ('gga_x_kt1', 1.0)] mix=[-1.0, 1.0, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 90, 145] source-coefs=[-1.0, 1.0, 1.0] source-aux={} notes=[]
+- slot0 1 lda_x w=-1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 90 gga_x_ssb_sw w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"A": 1.071769, "B": 0.137574, "C": 0.187883, "D": 0.303439130082, "E": 6.635315}
+  - ext_effective: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.071769, 0.137574, 0.187883, 0.303439130082, 6.635315]}
+  - ext_standalone: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.05151, 0.191458, 0.254433, 0.180708, 4.036674]} overridden=['_A', '_B', '_C', '_D', '_E'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.0025270680672958333, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.0025270680672958333, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=['_gamma'] at_default=['_delta']
+  - cmp: partial:no-source-aux
+### 91 gga_x_ssb spin=2 init=gga_x_ssb_init file=gga_x_ssb_sw.c
+- aux=[('lda_x', -1.0), ('gga_x_ssb_sw', 1.0), ('gga_x_kt1', 1.0)] mix=[-1.0, 1.0, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 90, 145] source-coefs=[-1.0, 1.0, 1.0] source-aux={} notes=[]
+- slot0 1 lda_x w=-1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 90 gga_x_ssb_sw w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"A": 1.071769, "B": 0.137574, "C": 0.187883, "D": 0.303439130082, "E": 6.635315}
+  - ext_effective: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.071769, 0.137574, 0.187883, 0.303439130082, 6.635315]}
+  - ext_standalone: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.05151, 0.191458, 0.254433, 0.180708, 4.036674]} overridden=['_A', '_B', '_C', '_D', '_E'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.0025270680672958333, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.0025270680672958333, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=['_gamma'] at_default=['_delta']
+  - cmp: partial:no-source-aux
+### 92 gga_x_ssb_d spin=1 init=gga_x_ssb_init file=gga_x_ssb_sw.c
+- aux=[('lda_x', -1.0), ('gga_x_ssb_sw', 1.0), ('gga_x_kt1', 1.0)] mix=[-1.0, 1.0, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 90, 145] source-coefs=[-1.0, 1.0, 1.0] source-aux={} notes=[]
+- slot0 1 lda_x w=-1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 90 gga_x_ssb_sw w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"A": 1.079966, "B": 0.197465, "C": 0.272729, "D": 0.34555190210000003, "E": 5.873645}
+  - ext_effective: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.079966, 0.197465, 0.272729, 0.34555190210000003, 5.873645]}
+  - ext_standalone: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.05151, 0.191458, 0.254433, 0.180708, 4.036674]} overridden=['_A', '_B', '_C', '_D', '_E'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.0021529826454022107, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.0021529826454022107, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=['_gamma'] at_default=['_delta']
+  - cmp: partial:no-source-aux
+### 92 gga_x_ssb_d spin=2 init=gga_x_ssb_init file=gga_x_ssb_sw.c
+- aux=[('lda_x', -1.0), ('gga_x_ssb_sw', 1.0), ('gga_x_kt1', 1.0)] mix=[-1.0, 1.0, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 90, 145] source-coefs=[-1.0, 1.0, 1.0] source-aux={} notes=[]
+- slot0 1 lda_x w=-1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 90 gga_x_ssb_sw w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"A": 1.079966, "B": 0.197465, "C": 0.272729, "D": 0.34555190210000003, "E": 5.873645}
+  - ext_effective: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.079966, 0.197465, 0.272729, 0.34555190210000003, 5.873645]}
+  - ext_standalone: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.05151, 0.191458, 0.254433, 0.180708, 4.036674]} overridden=['_A', '_B', '_C', '_D', '_E'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.0021529826454022107, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.0021529826454022107, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=['_gamma'] at_default=['_delta']
+  - cmp: partial:no-source-aux
+### 104 hyb_lda_xc_b93 spin=1 init=hyb_lda_xc_lda0_init file=lda_x.c
+- aux=[('lda_x', 0.5), ('lda_c_pw_mod', 0.5)] mix=[0.5, 0.5] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[1, 13] source-coefs=[0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 13 lda_c_pw_mod w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+### 104 hyb_lda_xc_b93 spin=2 init=hyb_lda_xc_lda0_init file=lda_x.c
+- aux=[('lda_x', 0.5), ('lda_c_pw_mod', 0.5)] mix=[0.5, 0.5] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[1, 13] source-coefs=[0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 13 lda_c_pw_mod w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+### 141 gga_x_optpbe_vdw spin=1 init=gga_x_optpbe_vdw_init file=gga_xc_edf1.c
+- aux=[('gga_x_pbe', 0.945268), ('gga_x_rpbe', 0.054732)] mix=[0.945268, 0.054732] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 117] source-coefs=None source-aux={"0": [1.04804, 0.175519], "1": [1.04804, 0.175519]} notes=['NONLIT-COEF-ARRAY']
+- slot0 101 gga_x_pbe w=0.945268 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 1.04804, "mu": 0.175519, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [1.04804, 0.175519]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+- slot1 117 gga_x_rpbe w=0.054732 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"rpbe_kappa": 1.04804, "rpbe_mu": 0.175519}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [1.04804, 0.175519]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+### 141 gga_x_optpbe_vdw spin=2 init=gga_x_optpbe_vdw_init file=gga_xc_edf1.c
+- aux=[('gga_x_pbe', 0.945268), ('gga_x_rpbe', 0.054732)] mix=[0.945268, 0.054732] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 117] source-coefs=None source-aux={"0": [1.04804, 0.175519], "1": [1.04804, 0.175519]} notes=['NONLIT-COEF-ARRAY']
+- slot0 101 gga_x_pbe w=0.945268 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 1.04804, "mu": 0.175519, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [1.04804, 0.175519]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+- slot1 117 gga_x_rpbe w=0.054732 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"rpbe_kappa": 1.04804, "rpbe_mu": 0.175519}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [1.04804, 0.175519]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+### 146 gga_xc_kt2 spin=1 init=gga_xc_kt2_init file=gga_x_kt.c
+- aux=[('lda_x', 0.07173000000000007), ('gga_x_kt1', 1.0), ('lda_c_vwn', 0.576727)] mix=[0.07173000000000007, 1.0, 0.576727] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 145, 7] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 1 lda_x w=0.07173000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.006, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=[] at_default=['_gamma', '_delta']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.576727 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 146 gga_xc_kt2 spin=2 init=gga_xc_kt2_init file=gga_x_kt.c
+- aux=[('lda_x', 0.07173000000000007), ('gga_x_kt1', 1.0), ('lda_c_vwn', 0.576727)] mix=[0.07173000000000007, 1.0, 0.576727] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 145, 7] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 1 lda_x w=0.07173000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.006, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=[] at_default=['_gamma', '_delta']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.576727 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 150 gga_x_sogga spin=1 init=gga_x_sogga_init file=gga_xc_edf1.c
+- aux=[('gga_x_pbe', 0.5), ('gga_x_rpbe', 0.5)] mix=[0.5, 0.5] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 117] source-coefs=[0.5, 0.5] source-aux={"0": [0.552, 0.12345679012345678], "1": [0.552, 0.12345679012345678]} notes=[]
+- slot0 101 gga_x_pbe w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.552, "mu": 0.12345679012345678, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.552, 0.12345679012345678]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+- slot1 117 gga_x_rpbe w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"rpbe_kappa": 0.552, "rpbe_mu": 0.12345679012345678}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.552, 0.12345679012345678]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+### 150 gga_x_sogga spin=2 init=gga_x_sogga_init file=gga_xc_edf1.c
+- aux=[('gga_x_pbe', 0.5), ('gga_x_rpbe', 0.5)] mix=[0.5, 0.5] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 117] source-coefs=[0.5, 0.5] source-aux={"0": [0.552, 0.12345679012345678], "1": [0.552, 0.12345679012345678]} notes=[]
+- slot0 101 gga_x_pbe w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.552, "mu": 0.12345679012345678, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.552, 0.12345679012345678]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+- slot1 117 gga_x_rpbe w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"rpbe_kappa": 0.552, "rpbe_mu": 0.12345679012345678}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.552, 0.12345679012345678]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: complete:full-match
+### 165 gga_xc_edf1 spin=1 init=gga_xc_edf1_init file=gga_xc_edf1.c
+- aux=[('lda_x', -0.9228179999999995), ('gga_x_b88', 10.4017), ('gga_x_b88', -8.44793), ('gga_c_lyp', 1.0)] mix=[-0.9228179999999995, 10.4017, -8.44793, 1.0] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 106, 106, 131] source-coefs=None source-aux={"1": [0.0035, 6.0], "3": [0.055, 0.158, 0.25, 0.3505]} notes=['NONLIT-COEF-ARRAY']
+- slot0 1 lda_x w=-0.9228179999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=10.4017 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0035, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0035, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=['_beta'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot2 106 gga_x_b88 w=-8.44793 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.055, "b": 0.158, "c": 0.25, "d": 0.3505}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.055, 0.158, 0.25, 0.3505]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=['_a', '_b', '_c', '_d'] at_default=[]
+  - cmp: complete:full-match
+### 165 gga_xc_edf1 spin=2 init=gga_xc_edf1_init file=gga_xc_edf1.c
+- aux=[('lda_x', -0.9228179999999995), ('gga_x_b88', 10.4017), ('gga_x_b88', -8.44793), ('gga_c_lyp', 1.0)] mix=[-0.9228179999999995, 10.4017, -8.44793, 1.0] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 106, 106, 131] source-coefs=None source-aux={"1": [0.0035, 6.0], "3": [0.055, 0.158, 0.25, 0.3505]} notes=['NONLIT-COEF-ARRAY']
+- slot0 1 lda_x w=-0.9228179999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=10.4017 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0035, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0035, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=['_beta'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot2 106 gga_x_b88 w=-8.44793 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.055, "b": 0.158, "c": 0.25, "d": 0.3505}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.055, 0.158, 0.25, 0.3505]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=['_a', '_b', '_c', '_d'] at_default=[]
+  - cmp: complete:full-match
+### 166 gga_xc_xlyp spin=1 init=gga_xc_xlyp_init file=gga_xc_1w.c
+- aux=[('lda_x', -0.06899999999999995), ('gga_x_b88', 0.722), ('gga_x_pw91', 0.347), ('gga_c_lyp', 1.0)] mix=[-0.06899999999999995, 0.722, 0.347, 1.0] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 106, 109, 131] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 1 lda_x w=-0.06899999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.722 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 109 gga_x_pw91 w=0.347 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19645, "b": 7.7956, "c": 0.2743, "d": -0.1508, "f": 0.004, "alpha": 100.0, "expo": 4.0}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_f', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 166 gga_xc_xlyp spin=2 init=gga_xc_xlyp_init file=gga_xc_1w.c
+- aux=[('lda_x', -0.06899999999999995), ('gga_x_b88', 0.722), ('gga_x_pw91', 0.347), ('gga_c_lyp', 1.0)] mix=[-0.06899999999999995, 0.722, 0.347, 1.0] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 106, 109, 131] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 1 lda_x w=-0.06899999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.722 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 109 gga_x_pw91 w=0.347 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19645, "b": 7.7956, "c": 0.2743, "d": -0.1508, "f": 0.004, "alpha": 100.0, "expo": 4.0}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_f', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 167 gga_xc_kt1 spin=1 init=gga_xc_kt1_init file=gga_x_kt.c
+- aux=[('gga_x_kt1', 1.0), ('lda_c_vwn', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[145, 7] source-coefs=[1.0, 1.0] source-aux={} notes=[]
+- slot0 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.006, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=[] at_default=['_gamma', '_delta']
+  - cmp: partial:no-source-aux
+- slot1 7 lda_c_vwn w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 167 gga_xc_kt1 spin=2 init=gga_xc_kt1_init file=gga_x_kt.c
+- aux=[('gga_x_kt1', 1.0), ('lda_c_vwn', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[145, 7] source-coefs=[1.0, 1.0] source-aux={} notes=[]
+- slot0 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.006, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=[] at_default=['_gamma', '_delta']
+  - cmp: partial:no-source-aux
+- slot1 7 lda_c_vwn w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 173 gga_xc_pbe1w spin=1 init=gga_xc_pbe1w_init file=gga_xc_1w.c
+- aux=[('lda_c_vwn', 0.26), ('gga_x_pbe', 1.0), ('gga_c_pbe', 0.74)] mix=[0.26, 1.0, 0.74] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[7, 101, 130] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 7 lda_c_vwn w=0.26 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 101 gga_x_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=0.74 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 173 gga_xc_pbe1w spin=2 init=gga_xc_pbe1w_init file=gga_xc_1w.c
+- aux=[('lda_c_vwn', 0.26), ('gga_x_pbe', 1.0), ('gga_c_pbe', 0.74)] mix=[0.26, 1.0, 0.74] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[7, 101, 130] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 7 lda_c_vwn w=0.26 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 101 gga_x_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=0.74 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 174 gga_xc_mpwlyp1w spin=1 init=gga_xc_mpwlyp1w_init file=gga_xc_1w.c
+- aux=[('lda_c_vwn', 0.12), ('gga_x_mpw91', 1.0), ('gga_c_lyp', 0.88)] mix=[0.12, 1.0, 0.88] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[7, 119, 131] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 7 lda_c_vwn w=0.12 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 119 gga_x_mpw91 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 131 gga_c_lyp w=0.88 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 174 gga_xc_mpwlyp1w spin=2 init=gga_xc_mpwlyp1w_init file=gga_xc_1w.c
+- aux=[('lda_c_vwn', 0.12), ('gga_x_mpw91', 1.0), ('gga_c_lyp', 0.88)] mix=[0.12, 1.0, 0.88] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[7, 119, 131] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 7 lda_c_vwn w=0.12 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 119 gga_x_mpw91 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 131 gga_c_lyp w=0.88 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 175 gga_xc_pbelyp1w spin=1 init=gga_xc_pbelyp1w_init file=gga_xc_1w.c
+- aux=[('lda_c_vwn', 0.26), ('gga_x_pbe', 1.0), ('gga_c_lyp', 0.74)] mix=[0.26, 1.0, 0.74] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[7, 101, 131] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 7 lda_c_vwn w=0.26 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 101 gga_x_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot2 131 gga_c_lyp w=0.74 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 175 gga_xc_pbelyp1w spin=2 init=gga_xc_pbelyp1w_init file=gga_xc_1w.c
+- aux=[('lda_c_vwn', 0.26), ('gga_x_pbe', 1.0), ('gga_c_lyp', 0.74)] mix=[0.26, 1.0, 0.74] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[7, 101, 131] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 7 lda_c_vwn w=0.26 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 101 gga_x_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot2 131 gga_c_lyp w=0.74 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 177 hyb_lda_xc_lda0 spin=1 init=hyb_lda_xc_lda0_init file=lda_x.c
+- aux=[('lda_x', 0.75), ('lda_c_pw_mod', 0.75)] mix=[0.75, 0.75] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[1, 13] source-coefs=[0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 13 lda_c_pw_mod w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+### 177 hyb_lda_xc_lda0 spin=2 init=hyb_lda_xc_lda0_init file=lda_x.c
+- aux=[('lda_x', 0.75), ('lda_c_pw_mod', 0.75)] mix=[0.75, 0.75] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[1, 13] source-coefs=[0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 13 lda_c_pw_mod w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+### 178 hyb_lda_xc_cam_lda0 spin=1 init=xc_hyb_lda_xc_cam_lda0_init file=hyb_lda_xc_cam_lda0.c
+- aux=[('lda_x', 0.5), ('lda_x_erf', 0.25), ('lda_c_pw_mod', 1.0)] mix=[0.5, 0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.3333333333333333, 0.5, -0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 546, 13] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:1.0 - alpha', 'COEF-EVAL-FAIL:-beta']
+- slot0 1 lda_x w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 546 lda_x_erf w=0.25 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.3333333333333333]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.3]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 13 lda_c_pw_mod w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+### 178 hyb_lda_xc_cam_lda0 spin=2 init=xc_hyb_lda_xc_cam_lda0_init file=hyb_lda_xc_cam_lda0.c
+- aux=[('lda_x', 0.5), ('lda_x_erf', 0.25), ('lda_c_pw_mod', 1.0)] mix=[0.5, 0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.3333333333333333, 0.5, -0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 546, 13] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:1.0 - alpha', 'COEF-EVAL-FAIL:-beta']
+- slot0 1 lda_x w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 546 lda_x_erf w=0.25 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.3333333333333333]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.3]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 13 lda_c_pw_mod w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+### 181 gga_xc_ncap spin=1 init=xc_gga_xc_ncap_init file=gga_x_ncap.c
+- aux=[('gga_x_ncap', 1.0), ('gga_c_p86', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[180, 132] source-coefs=[1.0, 1.0] source-aux={} notes=[]
+- slot0 180 gga_x_ncap w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 0.3451117169263783, "beta": 0.01808569669, "mu": 0.2195149727645171, "zeta": 0.30412141859531383}
+  - ext_effective: {"names": ["_alpha", "_beta", "_mu", "_zeta"], "values": [0.3451117169263783, 0.01808569669, 0.2195149727645171, 0.30412141859531383]}
+  - ext_standalone: {"names": ["_alpha", "_beta", "_mu", "_zeta"], "values": [0.3451117169263783, 0.01808569669, 0.2195149727645171, 0.30412141859531383]} overridden=[] at_default=['_alpha', '_beta', '_mu', '_zeta']
+  - cmp: partial:no-source-aux
+- slot1 132 gga_c_p86 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"malpha": 0.023266, "mbeta": 7.389e-06, "mgamma": 8.723, "mdelta": 0.472, "aa": 0.001667, "bb": 0.002568, "ftilde": 0.19195}
+  - ext_effective: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]}
+  - ext_standalone: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]} overridden=[] at_default=['_malpha', '_mbeta', '_mgamma', '_mdelta', '_aa', '_bb', '_ftilde']
+  - cmp: partial:no-source-aux
+### 181 gga_xc_ncap spin=2 init=xc_gga_xc_ncap_init file=gga_x_ncap.c
+- aux=[('gga_x_ncap', 1.0), ('gga_c_p86', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[180, 132] source-coefs=[1.0, 1.0] source-aux={} notes=[]
+- slot0 180 gga_x_ncap w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 0.3451117169263783, "beta": 0.01808569669, "mu": 0.2195149727645171, "zeta": 0.30412141859531383}
+  - ext_effective: {"names": ["_alpha", "_beta", "_mu", "_zeta"], "values": [0.3451117169263783, 0.01808569669, 0.2195149727645171, 0.30412141859531383]}
+  - ext_standalone: {"names": ["_alpha", "_beta", "_mu", "_zeta"], "values": [0.3451117169263783, 0.01808569669, 0.2195149727645171, 0.30412141859531383]} overridden=[] at_default=['_alpha', '_beta', '_mu', '_zeta']
+  - cmp: partial:no-source-aux
+- slot1 132 gga_c_p86 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"malpha": 0.023266, "mbeta": 7.389e-06, "mgamma": 8.723, "mdelta": 0.472, "aa": 0.001667, "bb": 0.002568, "ftilde": 0.19195}
+  - ext_effective: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]}
+  - ext_standalone: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]} overridden=[] at_default=['_malpha', '_mbeta', '_mgamma', '_mdelta', '_aa', '_bb', '_ftilde']
+  - cmp: partial:no-source-aux
+### 194 gga_xc_mohlyp spin=1 init=gga_xc_mohlyp_init file=gga_xc_edf1.c
+- aux=[('gga_x_optx', 1.0), ('lda_c_vwn', 0.5), ('gga_c_lyp', 0.5)] mix=[1.0, 0.5, 0.5] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[110, 7, 131] source-coefs=[1.0, 0.5, 0.5] source-aux={"0": [1.0, 1.388462403059519, 0.006]} notes=[]
+- slot0 110 gga_x_optx w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.0, "b": 1.3884624030595192, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma"], "values": [1.0, 1.3884624030595192, 0.006]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} overridden=['_a', '_b'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot1 7 lda_c_vwn w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot2 131 gga_c_lyp w=0.5 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 194 gga_xc_mohlyp spin=2 init=gga_xc_mohlyp_init file=gga_xc_edf1.c
+- aux=[('gga_x_optx', 1.0), ('lda_c_vwn', 0.5), ('gga_c_lyp', 0.5)] mix=[1.0, 0.5, 0.5] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[110, 7, 131] source-coefs=[1.0, 0.5, 0.5] source-aux={"0": [1.0, 1.388462403059519, 0.006]} notes=[]
+- slot0 110 gga_x_optx w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.0, "b": 1.3884624030595192, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma"], "values": [1.0, 1.3884624030595192, 0.006]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} overridden=['_a', '_b'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot1 7 lda_c_vwn w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot2 131 gga_c_lyp w=0.5 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 195 gga_xc_mohlyp2 spin=1 init=gga_xc_mohlyp2_init file=gga_xc_edf1.c
+- aux=[('gga_x_optx', 1.0), ('gga_c_lyp', 0.5)] mix=[1.0, 0.5] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[110, 131] source-coefs=[1.0, 0.5] source-aux={"0": [1.05151, 1.9878616224603132, 0.006]} notes=[]
+- slot0 110 gga_x_optx w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.05151, "b": 1.9878616224603134, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.9878616224603134, 0.006]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} overridden=['_b'] at_default=['_a', '_gamma']
+  - cmp: complete:full-match
+- slot1 131 gga_c_lyp w=0.5 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 195 gga_xc_mohlyp2 spin=2 init=gga_xc_mohlyp2_init file=gga_xc_edf1.c
+- aux=[('gga_x_optx', 1.0), ('gga_c_lyp', 0.5)] mix=[1.0, 0.5] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[110, 131] source-coefs=[1.0, 0.5] source-aux={"0": [1.05151, 1.9878616224603132, 0.006]} notes=[]
+- slot0 110 gga_x_optx w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.05151, "b": 1.9878616224603134, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.9878616224603134, 0.006]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} overridden=['_b'] at_default=['_a', '_gamma']
+  - cmp: complete:full-match
+- slot1 131 gga_c_lyp w=0.5 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 224 hyb_mgga_x_ms2h spin=1 init=hyb_mgga_x_ms2h_init file=mgga_x_ms.c
+- aux=[('mgga_x_ms2', 0.91)] mix=[0.91] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.09, 0.0] nlc=[0.0, 0.0] hyb_exx=0.09
+- source-ids=[223] source-coefs=[0.91] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 223 mgga_x_ms2 w=0.91 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.504, "c": 0.14601, "b": 4.0}
+  - ext_effective: {"names": ["_kappa", "_c", "_b"], "values": [0.504, 0.14601, 4.0]}
+  - ext_standalone: {"names": ["_kappa", "_c", "_b"], "values": [0.504, 0.14601, 4.0]} overridden=[] at_default=['_kappa', '_c', '_b']
+  - cmp: partial:no-source-aux
+### 224 hyb_mgga_x_ms2h spin=2 init=hyb_mgga_x_ms2h_init file=mgga_x_ms.c
+- aux=[('mgga_x_ms2', 0.91)] mix=[0.91] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.09, 0.0] nlc=[0.0, 0.0] hyb_exx=0.09
+- source-ids=[223] source-coefs=[0.91] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 223 mgga_x_ms2 w=0.91 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.504, "c": 0.14601, "b": 4.0}
+  - ext_effective: {"names": ["_kappa", "_c", "_b"], "values": [0.504, 0.14601, 4.0]}
+  - ext_standalone: {"names": ["_kappa", "_c", "_b"], "values": [0.504, 0.14601, 4.0]} overridden=[] at_default=['_kappa', '_c', '_b']
+  - cmp: partial:no-source-aux
+### 242 mgga_xc_tpsslyp1w spin=1 init=mgga_xc_tpsslyp1w_init file=hyb_mgga_xc_b88b95.c
+- aux=[('lda_c_vwn', 0.26), ('mgga_x_tpss', 1.0), ('gga_c_lyp', 0.74)] mix=[0.26, 1.0, 0.74] naux=3 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[7, 202, 131] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 7 lda_c_vwn w=0.26 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 202 mgga_x_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot2 131 gga_c_lyp w=0.74 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 242 mgga_xc_tpsslyp1w spin=2 init=mgga_xc_tpsslyp1w_init file=hyb_mgga_xc_b88b95.c
+- aux=[('lda_c_vwn', 0.26), ('mgga_x_tpss', 1.0), ('gga_c_lyp', 0.74)] mix=[0.26, 1.0, 0.74] naux=3 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[7, 202, 131] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 7 lda_c_vwn w=0.26 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 202 mgga_x_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot2 131 gga_c_lyp w=0.74 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 243 mgga_x_mk00b spin=1 init=mgga_x_mk00b_init file=mgga_x_rlda.c
+- aux=[('lda_x', -1.0), ('gga_x_b88', 1.0), ('mgga_x_gp86', 1.0)] mix=[-1.0, 1.0, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 106, 230] source-coefs=[-1.0, 1.0, 1.0] source-aux={"1": [0.0016, 6.0]} notes=[]
+- slot0 1 lda_x w=-1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0016, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0016, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=['_beta'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot2 230 mgga_x_gp86 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"prefactor": 0.8}
+  - ext_effective: {"names": ["_prefactor"], "values": [0.8]}
+  - ext_standalone: {"names": ["_prefactor"], "values": [0.8]} overridden=[] at_default=['_prefactor']
+  - cmp: partial:no-source-aux
+### 243 mgga_x_mk00b spin=2 init=mgga_x_mk00b_init file=mgga_x_rlda.c
+- aux=[('lda_x', -1.0), ('gga_x_b88', 1.0), ('mgga_x_gp86', 1.0)] mix=[-1.0, 1.0, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 106, 230] source-coefs=[-1.0, 1.0, 1.0] source-aux={"1": [0.0016, 6.0]} notes=[]
+- slot0 1 lda_x w=-1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0016, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0016, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=['_beta'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot2 230 mgga_x_gp86 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"prefactor": 0.8}
+  - ext_effective: {"names": ["_prefactor"], "values": [0.8]}
+  - ext_standalone: {"names": ["_prefactor"], "values": [0.8]} overridden=[] at_default=['_prefactor']
+  - cmp: partial:no-source-aux
+### 255 gga_xc_vv10 spin=1 init=gga_xc_vv10_init file=gga_xc_vv10.c
+- aux=[('gga_x_rpw86', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[5.9, 0.0093] hyb_exx=None
+- source-ids=[144, 130] source-coefs=[1.0, 1.0] source-aux={} notes=[]
+- slot0 144 gga_x_rpw86 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"aa": 1.851, "bb": 17.33, "cc": 0.163}
+  - ext_effective: {"names": ["_aa", "_bb", "_cc"], "values": [1.851, 17.33, 0.163]}
+  - ext_standalone: {"names": ["_aa", "_bb", "_cc"], "values": [1.851, 17.33, 0.163]} overridden=[] at_default=['_aa', '_bb', '_cc']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 255 gga_xc_vv10 spin=2 init=gga_xc_vv10_init file=gga_xc_vv10.c
+- aux=[('gga_x_rpw86', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[5.9, 0.0093] hyb_exx=None
+- source-ids=[144, 130] source-coefs=[1.0, 1.0] source-aux={} notes=[]
+- slot0 144 gga_x_rpw86 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"aa": 1.851, "bb": 17.33, "cc": 0.163}
+  - ext_effective: {"names": ["_aa", "_bb", "_cc"], "values": [1.851, 17.33, 0.163]}
+  - ext_standalone: {"names": ["_aa", "_bb", "_cc"], "values": [1.851, 17.33, 0.163]} overridden=[] at_default=['_aa', '_bb', '_cc']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 264 hyb_mgga_x_scan0 spin=1 init=hyb_mgga_x_scan0_init file=mgga_x_scan.c
+- aux=[('mgga_x_scan', 0.75)] mix=[0.75] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[263] source-coefs=[0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 263 mgga_x_scan w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT AMBI:hyb_mgga_x_scan0_params,mgga_x_scan_params (internal struct unread; effective EXT above is authoritative)
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1"], "values": [0.667, 0.8, 1.24, 0.065]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1"], "values": [0.667, 0.8, 1.24, 0.065]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1']
+  - cmp: partial:no-source-aux ext_fallback(src-only)="NO-SOURCE-AUX-PARSED:NO-SOURCE-AUX"
+### 264 hyb_mgga_x_scan0 spin=2 init=hyb_mgga_x_scan0_init file=mgga_x_scan.c
+- aux=[('mgga_x_scan', 0.75)] mix=[0.75] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[263] source-coefs=[0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 263 mgga_x_scan w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT AMBI:hyb_mgga_x_scan0_params,mgga_x_scan_params (internal struct unread; effective EXT above is authoritative)
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1"], "values": [0.667, 0.8, 1.24, 0.065]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1"], "values": [0.667, 0.8, 1.24, 0.065]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1']
+  - cmp: partial:no-source-aux ext_fallback(src-only)="NO-SOURCE-AUX-PARSED:NO-SOURCE-AUX"
+### 273 hyb_gga_xc_pbe_mol0 spin=1 init=hyb_gga_xc_pbemol0_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe_mol', 0.75), ('gga_c_pbe_mol', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[49, 272] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 49 gga_x_pbe_mol w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.27583, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.27583]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.27583]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 272 gga_c_pbe_mol w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.08384, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.08384, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.08384, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 273 hyb_gga_xc_pbe_mol0 spin=2 init=hyb_gga_xc_pbemol0_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe_mol', 0.75), ('gga_c_pbe_mol', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[49, 272] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 49 gga_x_pbe_mol w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.27583, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.27583]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.27583]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 272 gga_c_pbe_mol w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.08384, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.08384, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.08384, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 274 hyb_gga_xc_pbe_sol0 spin=1 init=hyb_gga_xc_pbesol0_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe_sol', 0.75), ('gga_c_pbe_sol', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[116, 133] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 116 gga_x_pbe_sol w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.12345679012345678, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.12345679012345678]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.12345679012345678]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 133 gga_c_pbe_sol w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.046, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.046, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.046, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 274 hyb_gga_xc_pbe_sol0 spin=2 init=hyb_gga_xc_pbesol0_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe_sol', 0.75), ('gga_c_pbe_sol', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[116, 133] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 116 gga_x_pbe_sol w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.12345679012345678, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.12345679012345678]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.12345679012345678]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 133 gga_c_pbe_sol w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.046, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.046, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.046, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 275 hyb_gga_xc_pbeb0 spin=1 init=hyb_gga_xc_pbeb0_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={"1": [0.050044, "DEFAULT", "DEFAULT", "DEFAULT"]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.050044, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.050044, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+### 275 hyb_gga_xc_pbeb0 spin=2 init=hyb_gga_xc_pbeb0_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={"1": [0.050044, "DEFAULT", "DEFAULT", "DEFAULT"]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.050044, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.050044, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+### 276 hyb_gga_xc_pbe_molb0 spin=1 init=hyb_gga_xc_pbemolb0_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe_mol', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[49, 130] source-coefs=[0.0, 1.0] source-aux={"1": [0.06288, "DEFAULT", "DEFAULT", "DEFAULT"]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 49 gga_x_pbe_mol w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.27583, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.27583]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.27583]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06288, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06288, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+### 276 hyb_gga_xc_pbe_molb0 spin=2 init=hyb_gga_xc_pbemolb0_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe_mol', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[49, 130] source-coefs=[0.0, 1.0] source-aux={"1": [0.06288, "DEFAULT", "DEFAULT", "DEFAULT"]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 49 gga_x_pbe_mol w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.27583, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.27583]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.27583]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06288, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06288, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+### 286 gga_xc_beefvdw spin=1 init=gga_xc_beefvdw_init file=gga_x_beefvdw.c
+- aux=[('gga_x_beefvdw', 1.0), ('lda_c_pw_mod', 0.6001664769), ('gga_c_pbe', 0.3998335231)] mix=[1.0, 0.6001664769, 0.3998335231] naux=3 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[285, 13, 130] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 285 gga_x_beefvdw w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 13 lda_c_pw_mod w=0.6001664769 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=0.3998335231 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 286 gga_xc_beefvdw spin=2 init=gga_xc_beefvdw_init file=gga_x_beefvdw.c
+- aux=[('gga_x_beefvdw', 1.0), ('lda_c_pw_mod', 0.6001664769), ('gga_c_pbe', 0.3998335231)] mix=[1.0, 0.6001664769, 0.3998335231] naux=3 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[285, 13, 130] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 285 gga_x_beefvdw w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 13 lda_c_pw_mod w=0.6001664769 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=0.3998335231 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 288 mgga_xc_hle17 spin=1 init=mgga_xc_hle17_init file=mgga_xc_hle17.c
+- aux=[('mgga_x_tpss', 1.25), ('mgga_c_tpss', 0.5)] mix=[1.25, 0.5] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[202, 231] source-coefs=[1.25, 0.5] source-aux={} notes=[]
+- slot0 202 mgga_x_tpss w=1.25 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 231 mgga_c_tpss w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "d": 2.8, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=[] at_default=['_beta', '_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 288 mgga_xc_hle17 spin=2 init=mgga_xc_hle17_init file=mgga_xc_hle17.c
+- aux=[('mgga_x_tpss', 1.25), ('mgga_c_tpss', 0.5)] mix=[1.25, 0.5] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[202, 231] source-coefs=[1.25, 0.5] source-aux={} notes=[]
+- slot0 202 mgga_x_tpss w=1.25 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 231 mgga_c_tpss w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "d": 2.8, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=[] at_default=['_beta', '_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 290 hyb_gga_xc_pbe50 spin=1 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.5), ('gga_c_pbe', 1.0)] mix=[0.5, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 290 hyb_gga_xc_pbe50 spin=2 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.5), ('gga_c_pbe', 1.0)] mix=[0.5, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 292 mgga_c_scan_rvv10 spin=1 init=mgga_c_scan_rvv10_init file=mgga_c_scan.c
+- aux=[('mgga_c_scan', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[15.7, 0.0093] hyb_exx=None
+- source-ids=[267] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 267 mgga_c_scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 292 mgga_c_scan_rvv10 spin=2 init=mgga_c_scan_rvv10_init file=mgga_c_scan.c
+- aux=[('mgga_c_scan', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[15.7, 0.0093] hyb_exx=None
+- source-ids=[267] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 267 mgga_c_scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 312 gga_x_revssb_d spin=1 init=gga_x_ssb_init file=gga_x_ssb_sw.c
+- aux=[('lda_x', -1.0), ('gga_x_ssb_sw', 1.0), ('gga_x_kt1', 1.0)] mix=[-1.0, 1.0, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 90, 145] source-coefs=[-1.0, 1.0, 1.0] source-aux={} notes=[]
+- slot0 1 lda_x w=-1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 90 gga_x_ssb_sw w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"A": 1.082138, "B": 0.177998, "C": 0.246582, "D": 0.288030667664, "E": 6.284673}
+  - ext_effective: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.082138, 0.177998, 0.246582, 0.288030667664, 6.284673]}
+  - ext_standalone: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.05151, 0.191458, 0.254433, 0.180708, 4.036674]} overridden=['_A', '_B', '_C', '_D', '_E'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.0016848298296575988, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.0016848298296575988, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=['_gamma'] at_default=['_delta']
+  - cmp: partial:no-source-aux
+### 312 gga_x_revssb_d spin=2 init=gga_x_ssb_init file=gga_x_ssb_sw.c
+- aux=[('lda_x', -1.0), ('gga_x_ssb_sw', 1.0), ('gga_x_kt1', 1.0)] mix=[-1.0, 1.0, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 90, 145] source-coefs=[-1.0, 1.0, 1.0] source-aux={} notes=[]
+- slot0 1 lda_x w=-1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 90 gga_x_ssb_sw w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"A": 1.082138, "B": 0.177998, "C": 0.246582, "D": 0.288030667664, "E": 6.284673}
+  - ext_effective: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.082138, 0.177998, 0.246582, 0.288030667664, 6.284673]}
+  - ext_standalone: {"names": ["_A", "_B", "_C", "_D", "_E"], "values": [1.05151, 0.191458, 0.254433, 0.180708, 4.036674]} overridden=['_A', '_B', '_C', '_D', '_E'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.0016848298296575988, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.0016848298296575988, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=['_gamma'] at_default=['_delta']
+  - cmp: partial:no-source-aux
+### 314 hyb_gga_xc_hflyp spin=1 init=xc_hyb_gga_xc_hflyp_init file=gga_c_lyp.c
+- aux=[('gga_c_lyp', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 1.0, 0.0] nlc=[0.0, 0.0] hyb_exx=1.0
+- source-ids=[131] source-coefs=[1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 314 hyb_gga_xc_hflyp spin=2 init=xc_hyb_gga_xc_hflyp_init file=gga_c_lyp.c
+- aux=[('gga_c_lyp', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 1.0, 0.0] nlc=[0.0, 0.0] hyb_exx=1.0
+- source-ids=[131] source-coefs=[1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 315 hyb_gga_xc_b3p86_nwchem spin=1 init=xc_hyb_gga_xc_b3p86_nwchem_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08), ('gga_x_b88', 0.72), ('lda_c_vwn_rpa', 1.0), ('gga_c_p86', 0.81), ('lda_c_pz', -0.81)] mix=[0.08, 0.72, 1.0, 0.81, -0.81] naux=5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 8, 132, 9] source-coefs=[0.08, 0.72, 1.0, 0.81, -0.81] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 132 gga_c_p86 w=0.81 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"malpha": 0.023266, "mbeta": 7.389e-06, "mgamma": 8.723, "mdelta": 0.472, "aa": 0.001667, "bb": 0.002568, "ftilde": 0.19195}
+  - ext_effective: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]}
+  - ext_standalone: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]} overridden=[] at_default=['_malpha', '_mbeta', '_mgamma', '_mdelta', '_aa', '_bb', '_ftilde']
+  - cmp: partial:no-source-aux
+- slot4 9 lda_c_pz w=-0.81 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": [-0.1423, -0.0843], "beta1": [1.0529, 1.3981], "beta2": [0.3334, 0.2611], "a": [0.0311, 0.01555], "b": [-0.048, -0.0269], "c": [0.002, 0.0007], "d": [-0.0116, -0.0048]}
+  - ext_effective: {"names": ["_gamma0", "_gamma1", "_beta10", "_beta11", "_beta20", "_beta21", "_a0", "_a1", "_b0", "_b1", "_c0", "_c1", "_d0", "_d1"], "values": [-0.1423, -0.0843, 1.0529, 1.3981, 0.3334, 0.2611, 0.0311, 0.01555, -0.048, -0.0269, 0.002, 0.0007, -0.0116, -0.0048]}
+  - ext_standalone: {"names": ["_gamma0", "_gamma1", "_beta10", "_beta11", "_beta20", "_beta21", "_a0", "_a1", "_b0", "_b1", "_c0", "_c1", "_d0", "_d1"], "values": [-0.1423, -0.0843, 1.0529, 1.3981, 0.3334, 0.2611, 0.0311, 0.01555, -0.048, -0.0269, 0.002, 0.0007, -0.0116, -0.0048]} overridden=[] at_default=['_gamma0', '_gamma1', '_beta10', '_beta11', '_beta20', '_beta21', '_a0', '_a1', '_b0', '_b1', '_c0', '_c1', '_d0', '_d1']
+  - cmp: partial:no-source-aux
+### 315 hyb_gga_xc_b3p86_nwchem spin=2 init=xc_hyb_gga_xc_b3p86_nwchem_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08), ('gga_x_b88', 0.72), ('lda_c_vwn_rpa', 1.0), ('gga_c_p86', 0.81), ('lda_c_pz', -0.81)] mix=[0.08, 0.72, 1.0, 0.81, -0.81] naux=5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 8, 132, 9] source-coefs=[0.08, 0.72, 1.0, 0.81, -0.81] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 132 gga_c_p86 w=0.81 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"malpha": 0.023266, "mbeta": 7.389e-06, "mgamma": 8.723, "mdelta": 0.472, "aa": 0.001667, "bb": 0.002568, "ftilde": 0.19195}
+  - ext_effective: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]}
+  - ext_standalone: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]} overridden=[] at_default=['_malpha', '_mbeta', '_mgamma', '_mdelta', '_aa', '_bb', '_ftilde']
+  - cmp: partial:no-source-aux
+- slot4 9 lda_c_pz w=-0.81 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": [-0.1423, -0.0843], "beta1": [1.0529, 1.3981], "beta2": [0.3334, 0.2611], "a": [0.0311, 0.01555], "b": [-0.048, -0.0269], "c": [0.002, 0.0007], "d": [-0.0116, -0.0048]}
+  - ext_effective: {"names": ["_gamma0", "_gamma1", "_beta10", "_beta11", "_beta20", "_beta21", "_a0", "_a1", "_b0", "_b1", "_c0", "_c1", "_d0", "_d1"], "values": [-0.1423, -0.0843, 1.0529, 1.3981, 0.3334, 0.2611, 0.0311, 0.01555, -0.048, -0.0269, 0.002, 0.0007, -0.0116, -0.0048]}
+  - ext_standalone: {"names": ["_gamma0", "_gamma1", "_beta10", "_beta11", "_beta20", "_beta21", "_a0", "_a1", "_b0", "_b1", "_c0", "_c1", "_d0", "_d1"], "values": [-0.1423, -0.0843, 1.0529, 1.3981, 0.3334, 0.2611, 0.0311, 0.01555, -0.048, -0.0269, 0.002, 0.0007, -0.0116, -0.0048]} overridden=[] at_default=['_gamma0', '_gamma1', '_beta10', '_beta11', '_beta20', '_beta21', '_a0', '_a1', '_b0', '_b1', '_c0', '_c1', '_d0', '_d1']
+  - cmp: partial:no-source-aux
+### 325 hyb_gga_xc_relpbe0 spin=1 init=hyb_gga_xc_relpbe_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.768813450922013), ('gga_c_pbe', 0.39051822098129085), ('lda_c_pw_mod', 0.2189635580374183)] mix=[0.768813450922013, 0.39051822098129085, 0.2189635580374183] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2311865490779869, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2311865490779869
+- source-ids=[101, 130, 13] source-coefs=[0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.768813450922013 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 1.009008835630956, "mu": 0.04102242166916949, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [1.009008835630956, 0.04102242166916949]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=0.39051822098129085 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06791249476107648, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06791249476107648, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+- slot2 13 lda_c_pw_mod w=0.2189635580374183 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+### 325 hyb_gga_xc_relpbe0 spin=2 init=hyb_gga_xc_relpbe_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.768813450922013), ('gga_c_pbe', 0.39051822098129085), ('lda_c_pw_mod', 0.2189635580374183)] mix=[0.768813450922013, 0.39051822098129085, 0.2189635580374183] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2311865490779869, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2311865490779869
+- source-ids=[101, 130, 13] source-coefs=[0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.768813450922013 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 1.009008835630956, "mu": 0.04102242166916949, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [1.009008835630956, 0.04102242166916949]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=['_kappa', '_mu'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=0.39051822098129085 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06791249476107648, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06791249476107648, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+- slot2 13 lda_c_pw_mod w=0.2189635580374183 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.0310907, 0.01554535, 0.0168869], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.7099209341613657}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.0310907, 0.01554535, 0.0168869, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.7099209341613657]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+### 348 mgga_xc_t_hle17 spin=1 init=mgga_xc_t_hle17_init file=mgga_xc_hle17.c
+- aux=[('mgga_x_tpss', 1.35), ('mgga_c_tpss', 1.0)] mix=[1.35, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[202, 231] source-coefs=[1.35, 1.0] source-aux={} notes=[]
+- slot0 202 mgga_x_tpss w=1.35 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 231 mgga_c_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "d": 2.8, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=[] at_default=['_beta', '_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 348 mgga_xc_t_hle17 spin=2 init=mgga_xc_t_hle17_init file=mgga_xc_hle17.c
+- aux=[('mgga_x_tpss', 1.35), ('mgga_c_tpss', 1.0)] mix=[1.35, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[202, 231] source-coefs=[1.35, 1.0] source-aux={} notes=[]
+- slot0 202 mgga_x_tpss w=1.35 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 231 mgga_c_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "d": 2.8, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=[] at_default=['_beta', '_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 385 hyb_gga_xc_cqtp25 spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 0.4948), ('lda_c_vwn', 0.4102), ('gga_c_lyp', 0.5898)] mix=[0.0, 0.4948, 0.4102, 0.5898] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.4153, 1.0, -0.4948] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.4948 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.4153]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.4102 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.5898 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 385 hyb_gga_xc_cqtp25 spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 0.4948), ('lda_c_vwn', 0.4102), ('gga_c_lyp', 0.5898)] mix=[0.0, 0.4948, 0.4102, 0.5898] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.4153, 1.0, -0.4948] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.4948 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.4153]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.4102 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.5898 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 389 hyb_mgga_xc_br3p86 spin=1 init=hyb_mgga_xc_br3p86_init file=hyb_mgga_xc_br3p86.c
+- aux=[('lda_x', 0.10999999999999999), ('mgga_x_br89_1', 0.67), ('lda_c_vwn', 0.15000000000000002), ('gga_c_p86vwn', 0.85)] mix=[0.10999999999999999, 0.67, 0.15000000000000002, 0.85] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22
+- source-ids=[1, 214, 7, 252] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.10999999999999999 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 214 mgga_x_br89_1 w=0.67 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"gamma": 1.0, "at": 0.0}
+  - ext_effective: {"names": ["_gamma", "_at"], "values": [1.0, 0.0]}
+  - ext_standalone: {"names": ["_gamma", "_at"], "values": [1.0, 0.0]} overridden=[] at_default=['_gamma', '_at']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.15000000000000002 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 252 gga_c_p86vwn w=0.85 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"malpha": 0.023266, "mbeta": 7.389e-06, "mgamma": 8.723, "mdelta": 0.472, "aa": 0.001667, "bb": 0.002568, "ftilde": 0.19195}
+  - ext_effective: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]}
+  - ext_standalone: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]} overridden=[] at_default=['_malpha', '_mbeta', '_mgamma', '_mdelta', '_aa', '_bb', '_ftilde']
+  - cmp: partial:no-source-aux
+### 389 hyb_mgga_xc_br3p86 spin=2 init=hyb_mgga_xc_br3p86_init file=hyb_mgga_xc_br3p86.c
+- aux=[('lda_x', 0.10999999999999999), ('mgga_x_br89_1', 0.67), ('lda_c_vwn', 0.15000000000000002), ('gga_c_p86vwn', 0.85)] mix=[0.10999999999999999, 0.67, 0.15000000000000002, 0.85] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22
+- source-ids=[1, 214, 7, 252] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.10999999999999999 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 214 mgga_x_br89_1 w=0.67 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"gamma": 1.0, "at": 0.0}
+  - ext_effective: {"names": ["_gamma", "_at"], "values": [1.0, 0.0]}
+  - ext_standalone: {"names": ["_gamma", "_at"], "values": [1.0, 0.0]} overridden=[] at_default=['_gamma', '_at']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.15000000000000002 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 252 gga_c_p86vwn w=0.85 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"malpha": 0.023266, "mbeta": 7.389e-06, "mgamma": 8.723, "mdelta": 0.472, "aa": 0.001667, "bb": 0.002568, "ftilde": 0.19195}
+  - ext_effective: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]}
+  - ext_standalone: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]} overridden=[] at_default=['_malpha', '_mbeta', '_mgamma', '_mdelta', '_aa', '_bb', '_ftilde']
+  - cmp: partial:no-source-aux
+### 392 hyb_gga_xc_pbe_2x spin=1 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.43999999999999995), ('gga_c_pbe', 1.0)] mix=[0.43999999999999995, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.56, 0.0] nlc=[0.0, 0.0] hyb_exx=0.56
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.43999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 392 hyb_gga_xc_pbe_2x spin=2 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.43999999999999995), ('gga_c_pbe', 1.0)] mix=[0.43999999999999995, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.56, 0.0] nlc=[0.0, 0.0] hyb_exx=0.56
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.43999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 393 hyb_gga_xc_pbe38 spin=1 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.625), ('gga_c_pbe', 1.0)] mix=[0.625, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.375, 0.0] nlc=[0.0, 0.0] hyb_exx=0.375
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.625 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 393 hyb_gga_xc_pbe38 spin=2 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.625), ('gga_c_pbe', 1.0)] mix=[0.625, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.375, 0.0] nlc=[0.0, 0.0] hyb_exx=0.375
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.625 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 394 hyb_gga_xc_b3lyp3 spin=1 init=xc_hyb_gga_xc_b3lyp3_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_vwn_3', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 30, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 30 lda_c_vwn_3 w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 394 hyb_gga_xc_b3lyp3 spin=2 init=xc_hyb_gga_xc_b3lyp3_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_vwn_3', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 30, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 30 lda_c_vwn_3 w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 395 hyb_gga_xc_cam_o3lyp spin=1 init=hyb_gga_xc_cam_o3lyp_init file=hyb_gga_xc_cam_o3lyp.c
+- aux=[('lda_x_erf', 0.07100691700000006), ('gga_x_ityh_optx', 0.8133), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.07100691700000006, 0.8133, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.33, 0.8, -0.6839000000000001] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[546, 622, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 546 lda_x_erf w=0.07100691700000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.3]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 622 gga_x_ityh_optx w=0.8133 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.05151, "b": 1.5385818404305593, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma", "_omega"], "values": [1.05151, 1.5385818404305593, 0.006, 0.33]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma", "_omega"], "values": [1.05151, 1.5385818404305593, 0.006, 0.2]} overridden=['_omega'] at_default=['_a', '_b', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 395 hyb_gga_xc_cam_o3lyp spin=2 init=hyb_gga_xc_cam_o3lyp_init file=hyb_gga_xc_cam_o3lyp.c
+- aux=[('lda_x_erf', 0.07100691700000006), ('gga_x_ityh_optx', 0.8133), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.07100691700000006, 0.8133, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.33, 0.8, -0.6839000000000001] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[546, 622, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 546 lda_x_erf w=0.07100691700000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.3]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 622 gga_x_ityh_optx w=0.8133 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.05151, "b": 1.5385818404305593, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma", "_omega"], "values": [1.05151, 1.5385818404305593, 0.006, 0.33]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma", "_omega"], "values": [1.05151, 1.5385818404305593, 0.006, 0.2]} overridden=['_omega'] at_default=['_a', '_b', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 396 hyb_mgga_xc_tpss0 spin=1 init=hyb_mgga_xc_tpss0_init file=hyb_mgga_xc_tpssh.c
+- aux=[('mgga_x_tpss', 0.75), ('mgga_c_tpss', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[202, 231] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 202 mgga_x_tpss w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 231 mgga_c_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "d": 2.8, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=[] at_default=['_beta', '_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 396 hyb_mgga_xc_tpss0 spin=2 init=hyb_mgga_xc_tpss0_init file=hyb_mgga_xc_tpssh.c
+- aux=[('mgga_x_tpss', 0.75), ('mgga_c_tpss', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[202, 231] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 202 mgga_x_tpss w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 231 mgga_c_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "d": 2.8, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=[] at_default=['_beta', '_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 398 hyb_mgga_xc_b94_hyb spin=1 init=hyb_mgga_xc_b94_hyb_init file=mgga_c_b94.c
+- aux=[('mgga_x_br89', 0.846), ('mgga_c_b94', 1.0)] mix=[0.846, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.154, 0.0] nlc=[0.0, 0.0] hyb_exx=0.154
+- source-ids=[206, 397] source-coefs=[0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 206 mgga_x_br89 w=0.846 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"gamma": 1.0, "at": 0.0}
+  - ext_effective: {"names": ["_gamma", "_at"], "values": [1.0, 0.0]}
+  - ext_standalone: {"names": ["_gamma", "_at"], "values": [0.8, 0.0]} overridden=['_gamma'] at_default=['_at']
+  - cmp: partial:no-source-aux
+- slot1 397 mgga_c_b94 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"gamma": 1.0, "css": 0.88, "cab": 0.66}
+  - ext_effective: {"names": ["_gamma", "_css", "_cab"], "values": [1.0, 0.88, 0.66]}
+  - ext_standalone: {"names": ["_gamma", "_css", "_cab"], "values": [1.0, 0.88, 0.63]} overridden=['_cab'] at_default=['_gamma', '_css']
+  - cmp: partial:no-source-aux
+### 398 hyb_mgga_xc_b94_hyb spin=2 init=hyb_mgga_xc_b94_hyb_init file=mgga_c_b94.c
+- aux=[('mgga_x_br89', 0.846), ('mgga_c_b94', 1.0)] mix=[0.846, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.154, 0.0] nlc=[0.0, 0.0] hyb_exx=0.154
+- source-ids=[206, 397] source-coefs=[0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 206 mgga_x_br89 w=0.846 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"gamma": 1.0, "at": 0.0}
+  - ext_effective: {"names": ["_gamma", "_at"], "values": [1.0, 0.0]}
+  - ext_standalone: {"names": ["_gamma", "_at"], "values": [0.8, 0.0]} overridden=['_gamma'] at_default=['_at']
+  - cmp: partial:no-source-aux
+- slot1 397 mgga_c_b94 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"gamma": 1.0, "css": 0.88, "cab": 0.66}
+  - ext_effective: {"names": ["_gamma", "_css", "_cab"], "values": [1.0, 0.88, 0.66]}
+  - ext_standalone: {"names": ["_gamma", "_css", "_cab"], "values": [1.0, 0.88, 0.63]} overridden=['_cab'] at_default=['_gamma', '_css']
+  - cmp: partial:no-source-aux
+### 400 hyb_gga_xc_lc_blyp spin=1 init=xc_hyb_gga_xc_lc_blyp_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[529, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 400 hyb_gga_xc_lc_blyp spin=2 init=xc_hyb_gga_xc_lc_blyp_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[529, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 401 hyb_gga_xc_b3pw91 spin=1 init=xc_hyb_gga_xc_b3pw91_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_pw', 0.18999999999999995), ('gga_c_pw91', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 12, 134] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 12 lda_c_pw w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.031091, 0.015545, 0.016887], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.709921}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.031091, 0.015545, 0.016887, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.709921]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.031091, 0.015545, 0.016887, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.709921]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+- slot3 134 gga_c_pw91 w=0.81 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 401 hyb_gga_xc_b3pw91 spin=2 init=xc_hyb_gga_xc_b3pw91_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_pw', 0.18999999999999995), ('gga_c_pw91', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 12, 134] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 12 lda_c_pw w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.031091, 0.015545, 0.016887], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.709921}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.031091, 0.015545, 0.016887, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.709921]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.031091, 0.015545, 0.016887, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.709921]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+- slot3 134 gga_c_pw91 w=0.81 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 402 hyb_gga_xc_b3lyp spin=1 init=xc_hyb_gga_xc_b3lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_vwn_rpa', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 402 hyb_gga_xc_b3lyp spin=2 init=xc_hyb_gga_xc_b3lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_vwn_rpa', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 403 hyb_gga_xc_b3p86 spin=1 init=xc_hyb_gga_xc_b3p86_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_vwn_rpa', 0.18999999999999995), ('gga_c_p86', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 8, 132] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 132 gga_c_p86 w=0.81 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"malpha": 0.023266, "mbeta": 7.389e-06, "mgamma": 8.723, "mdelta": 0.472, "aa": 0.001667, "bb": 0.002568, "ftilde": 0.19195}
+  - ext_effective: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]}
+  - ext_standalone: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]} overridden=[] at_default=['_malpha', '_mbeta', '_mgamma', '_mdelta', '_aa', '_bb', '_ftilde']
+  - cmp: partial:no-source-aux
+### 403 hyb_gga_xc_b3p86 spin=2 init=xc_hyb_gga_xc_b3p86_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_vwn_rpa', 0.18999999999999995), ('gga_c_p86', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 8, 132] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 132 gga_c_p86 w=0.81 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"malpha": 0.023266, "mbeta": 7.389e-06, "mgamma": 8.723, "mdelta": 0.472, "aa": 0.001667, "bb": 0.002568, "ftilde": 0.19195}
+  - ext_effective: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]}
+  - ext_standalone: {"names": ["_malpha", "_mbeta", "_mgamma", "_mdelta", "_aa", "_bb", "_ftilde"], "values": [0.023266, 7.389e-06, 8.723, 0.472, 0.001667, 0.002568, 0.19195]} overridden=[] at_default=['_malpha', '_mbeta', '_mgamma', '_mdelta', '_aa', '_bb', '_ftilde']
+  - cmp: partial:no-source-aux
+### 404 hyb_gga_xc_o3lyp spin=1 init=hyb_gga_xc_o3lyp_init file=hyb_gga_xc_o3lyp.c
+- aux=[('lda_x', 0.07100691700000006), ('gga_x_optx', 0.8133), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.07100691700000006, 0.8133, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1161, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1161
+- source-ids=[1, 110, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.07100691700000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 110 gga_x_optx w=0.8133 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.05151, "b": 1.5385818404305593, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} overridden=[] at_default=['_a', '_b', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 404 hyb_gga_xc_o3lyp spin=2 init=hyb_gga_xc_o3lyp_init file=hyb_gga_xc_o3lyp.c
+- aux=[('lda_x', 0.07100691700000006), ('gga_x_optx', 0.8133), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.07100691700000006, 0.8133, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1161, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1161
+- source-ids=[1, 110, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.07100691700000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 110 gga_x_optx w=0.8133 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.05151, "b": 1.5385818404305593, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} overridden=[] at_default=['_a', '_b', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 405 hyb_gga_xc_mpw1k spin=1 init=xc_hyb_gga_xc_mpw1k_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.5720000000000001), ('gga_c_pw91', 1.0)] mix=[0.5720000000000001, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.428, 0.0] nlc=[0.0, 0.0] hyb_exx=0.428
+- source-ids=[119, 134] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.5720000000000001 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 134 gga_c_pw91 w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 405 hyb_gga_xc_mpw1k spin=2 init=xc_hyb_gga_xc_mpw1k_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.5720000000000001), ('gga_c_pw91', 1.0)] mix=[0.5720000000000001, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.428, 0.0] nlc=[0.0, 0.0] hyb_exx=0.428
+- source-ids=[119, 134] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.5720000000000001 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 134 gga_c_pw91 w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 406 hyb_gga_xc_pbeh spin=1 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 406 hyb_gga_xc_pbeh spin=2 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 409 hyb_gga_xc_apf spin=1 init=xc_hyb_gga_xc_apf_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.03288000000000003), ('gga_x_b88', 0.29591999999999996), ('lda_c_pw', 0.07808999999999998), ('gga_c_pw91', 0.33291), ('gga_x_pbe', 0.44175), ('gga_c_pbe', 0.589)] mix=[0.03288000000000003, 0.29591999999999996, 0.07808999999999998, 0.33291, 0.44175, 0.589] naux=6 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.22945, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22945
+- source-ids=[1, 106, 12, 134, 101, 130] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:(1.0 - xb3pw91 - 0.72)*fb3pw91', 'COEF-EVAL-FAIL:0.72*fb3pw91', 'COEF-EVAL-FAIL:(1.0 - 0.81)*fb3pw91', 'COEF-EVAL-FAIL:0.81*fb3pw91', 'COEF-EVAL-FAIL:(1.0 - xpbe0)*fpbe0', 'COEF-EVAL-FAIL:fpbe0']
+- slot0 1 lda_x w=0.03288000000000003 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.29591999999999996 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 12 lda_c_pw w=0.07808999999999998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.031091, 0.015545, 0.016887], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.709921}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.031091, 0.015545, 0.016887, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.709921]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.031091, 0.015545, 0.016887, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.709921]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+- slot3 134 gga_c_pw91 w=0.33291 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot4 101 gga_x_pbe w=0.44175 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot5 130 gga_c_pbe w=0.589 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 409 hyb_gga_xc_apf spin=2 init=xc_hyb_gga_xc_apf_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.03288000000000003), ('gga_x_b88', 0.29591999999999996), ('lda_c_pw', 0.07808999999999998), ('gga_c_pw91', 0.33291), ('gga_x_pbe', 0.44175), ('gga_c_pbe', 0.589)] mix=[0.03288000000000003, 0.29591999999999996, 0.07808999999999998, 0.33291, 0.44175, 0.589] naux=6 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.22945, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22945
+- source-ids=[1, 106, 12, 134, 101, 130] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:(1.0 - xb3pw91 - 0.72)*fb3pw91', 'COEF-EVAL-FAIL:0.72*fb3pw91', 'COEF-EVAL-FAIL:(1.0 - 0.81)*fb3pw91', 'COEF-EVAL-FAIL:0.81*fb3pw91', 'COEF-EVAL-FAIL:(1.0 - xpbe0)*fpbe0', 'COEF-EVAL-FAIL:fpbe0']
+- slot0 1 lda_x w=0.03288000000000003 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.29591999999999996 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 12 lda_c_pw w=0.07808999999999998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pp": [1.0, 1.0, 1.0], "a": [0.031091, 0.015545, 0.016887], "alpha1": [0.2137, 0.20548, 0.11125], "beta1": [7.5957, 14.1189, 10.357], "beta2": [3.5876, 6.1977, 3.6231], "beta3": [1.6382, 3.3662, 0.88026], "beta4": [0.49294, 0.62517, 0.49671], "fz20": 1.709921}
+  - ext_effective: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.031091, 0.015545, 0.016887, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.709921]}
+  - ext_standalone: {"names": ["_pp[0]", "_pp[1]", "_pp[2]", "_a[0]", "_a[1]", "_a[2]", "_alpha1[0]", "_alpha1[1]", "_alpha1[2]", "_beta1[0]", "_beta1[1]", "_beta1[2]", "_beta2[0]", "_beta2[1]", "_beta2[2]", "_beta3[0]", "_beta3[1]", "_beta3[2]", "_beta4[0]", "_beta4[1]", "_beta4[2]", "_fz20"], "values": [1.0, 1.0, 1.0, 0.031091, 0.015545, 0.016887, 0.2137, 0.20548, 0.11125, 7.5957, 14.1189, 10.357, 3.5876, 6.1977, 3.6231, 1.6382, 3.3662, 0.88026, 0.49294, 0.62517, 0.49671, 1.709921]} overridden=[] at_default=['_pp[0]', '_pp[1]', '_pp[2]', '_a[0]', '_a[1]', '_a[2]', '_alpha1[0]', '_alpha1[1]', '_alpha1[2]', '_beta1[0]', '_beta1[1]', '_beta1[2]', '_beta2[0]', '_beta2[1]', '_beta2[2]', '_beta3[0]', '_beta3[1]', '_beta3[2]', '_beta4[0]', '_beta4[1]', '_beta4[2]', '_fz20']
+  - cmp: partial:no-source-aux
+- slot3 134 gga_c_pw91 w=0.33291 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot4 101 gga_x_pbe w=0.44175 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot5 130 gga_c_pbe w=0.589 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 411 hyb_gga_xc_x3lyp spin=1 init=hyb_gga_xc_x3lyp_init file=hyb_gga_xc_o3lyp.c
+- aux=[('lda_x', 0.07300000000000006), ('gga_x_b88', 0.542385), ('gga_x_pw91', 0.16661499999999999), ('lda_c_vwn_rpa', 0.129), ('gga_c_lyp', 0.871)] mix=[0.07300000000000006, 0.542385, 0.16661499999999999, 0.129, 0.871] naux=5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.218, 0.0] nlc=[0.0, 0.0] hyb_exx=0.218
+- source-ids=[1, 106, 109, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.07300000000000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.542385 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 109 gga_x_pw91 w=0.16661499999999999 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19645, "b": 7.7956, "c": 0.2743, "d": -0.1508, "f": 0.004, "alpha": 100.0, "expo": 4.0}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_f', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot3 8 lda_c_vwn_rpa w=0.129 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot4 131 gga_c_lyp w=0.871 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 411 hyb_gga_xc_x3lyp spin=2 init=hyb_gga_xc_x3lyp_init file=hyb_gga_xc_o3lyp.c
+- aux=[('lda_x', 0.07300000000000006), ('gga_x_b88', 0.542385), ('gga_x_pw91', 0.16661499999999999), ('lda_c_vwn_rpa', 0.129), ('gga_c_lyp', 0.871)] mix=[0.07300000000000006, 0.542385, 0.16661499999999999, 0.129, 0.871] naux=5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.218, 0.0] nlc=[0.0, 0.0] hyb_exx=0.218
+- source-ids=[1, 106, 109, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.07300000000000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.542385 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 109 gga_x_pw91 w=0.16661499999999999 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19645, "b": 7.7956, "c": 0.2743, "d": -0.1508, "f": 0.004, "alpha": 100.0, "expo": 4.0}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_f', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot3 8 lda_c_vwn_rpa w=0.129 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot4 131 gga_c_lyp w=0.871 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 412 hyb_gga_xc_b1wc spin=1 init=xc_hyb_gga_xc_b1wc_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_wc', 0.84), ('gga_c_pbe', 1.0)] mix=[0.84, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.16, 0.0] nlc=[0.0, 0.0] hyb_exx=0.16
+- source-ids=[118, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 118 gga_x_wc w=0.84 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 412 hyb_gga_xc_b1wc spin=2 init=xc_hyb_gga_xc_b1wc_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_wc', 0.84), ('gga_c_pbe', 1.0)] mix=[0.84, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.16, 0.0] nlc=[0.0, 0.0] hyb_exx=0.16
+- source-ids=[118, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 118 gga_x_wc w=0.84 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 415 hyb_gga_xc_mpw3pw spin=1 init=xc_hyb_gga_xc_mpw3pw_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_mpw91', 0.72), ('lda_c_vwn_rpa', 0.18999999999999995), ('gga_c_pw91', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 119, 8, 134] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 119 gga_x_mpw91 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 134 gga_c_pw91 w=0.81 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 415 hyb_gga_xc_mpw3pw spin=2 init=xc_hyb_gga_xc_mpw3pw_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_mpw91', 0.72), ('lda_c_vwn_rpa', 0.18999999999999995), ('gga_c_pw91', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 119, 8, 134] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 119 gga_x_mpw91 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 134 gga_c_pw91 w=0.81 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 416 hyb_gga_xc_b1lyp spin=1 init=xc_hyb_gga_xc_b1lyp_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_b88', 0.75), ('gga_c_lyp', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[106, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 416 hyb_gga_xc_b1lyp spin=2 init=xc_hyb_gga_xc_b1lyp_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_b88', 0.75), ('gga_c_lyp', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[106, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 417 hyb_gga_xc_b1pw91 spin=1 init=xc_hyb_gga_xc_b1pw91_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_b88', 0.75), ('gga_c_pw91', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[106, 134] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 134 gga_c_pw91 w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 417 hyb_gga_xc_b1pw91 spin=2 init=xc_hyb_gga_xc_b1pw91_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_b88', 0.75), ('gga_c_pw91', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[106, 134] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 134 gga_c_pw91 w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 418 hyb_gga_xc_mpw1pw spin=1 init=xc_hyb_gga_xc_mpw1pw_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.75), ('gga_c_pw91', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[119, 134] source-coefs=[1.0, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_MPW1PW', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 134 gga_c_pw91 w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 418 hyb_gga_xc_mpw1pw spin=2 init=xc_hyb_gga_xc_mpw1pw_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.75), ('gga_c_pw91', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[119, 134] source-coefs=[1.0, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_MPW1PW', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 134 gga_c_pw91 w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 419 hyb_gga_xc_mpw3lyp spin=1 init=xc_hyb_gga_xc_mpw3lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.07300000000000006), ('gga_x_mpw91', 0.709), ('lda_c_vwn_rpa', 0.129), ('gga_c_lyp', 0.871)] mix=[0.07300000000000006, 0.709, 0.129, 0.871] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.218, 0.0] nlc=[0.0, 0.0] hyb_exx=0.218
+- source-ids=[1, 119, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.07300000000000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 119 gga_x_mpw91 w=0.709 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.129 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.871 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 419 hyb_gga_xc_mpw3lyp spin=2 init=xc_hyb_gga_xc_mpw3lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.07300000000000006), ('gga_x_mpw91', 0.709), ('lda_c_vwn_rpa', 0.129), ('gga_c_lyp', 0.871)] mix=[0.07300000000000006, 0.709, 0.129, 0.871] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.218, 0.0] nlc=[0.0, 0.0] hyb_exx=0.218
+- source-ids=[1, 119, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.07300000000000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 119 gga_x_mpw91 w=0.709 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.129 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.871 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 427 hyb_gga_xc_hse03 spin=1 init=hyb_gga_xc_hse_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_x_wpbeh', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.10606601717798213, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 524, 130] source-coefs=[1.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot1 524 gga_x_wpbeh w=-0.25 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.18898815748423098]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 427 hyb_gga_xc_hse03 spin=2 init=hyb_gga_xc_hse_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_x_wpbeh', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.10606601717798213, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 524, 130] source-coefs=[1.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot1 524 gga_x_wpbeh w=-0.25 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.18898815748423098]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 428 hyb_gga_xc_hse06 spin=1 init=hyb_gga_xc_hse_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_x_wpbeh', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 524, 130] source-coefs=[1.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot1 524 gga_x_wpbeh w=-0.25 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.11]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 428 hyb_gga_xc_hse06 spin=2 init=hyb_gga_xc_hse_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_x_wpbeh', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 524, 130] source-coefs=[1.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot1 524 gga_x_wpbeh w=-0.25 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.11]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 429 hyb_gga_xc_hjs_pbe spin=1 init=hyb_gga_xc_hjs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_x_hjs_pbe', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 525, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_HJS_PBE', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 525 gga_x_hjs_pbe w=-0.25 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 429 hyb_gga_xc_hjs_pbe spin=2 init=hyb_gga_xc_hjs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_x_hjs_pbe', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 525, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_HJS_PBE', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 525 gga_x_hjs_pbe w=-0.25 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 430 hyb_gga_xc_hjs_pbe_sol spin=1 init=hyb_gga_xc_hjs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe_sol', 1.0), ('gga_x_hjs_pbe_sol', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[526, 526, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_HJS_PBE_SOL', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 526 gga_x_hjs_pbe_sol w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 526 gga_x_hjs_pbe_sol w=-0.25 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 430 hyb_gga_xc_hjs_pbe_sol spin=2 init=hyb_gga_xc_hjs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe_sol', 1.0), ('gga_x_hjs_pbe_sol', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[526, 526, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_HJS_PBE_SOL', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 526 gga_x_hjs_pbe_sol w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 526 gga_x_hjs_pbe_sol w=-0.25 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 431 hyb_gga_xc_hjs_b88 spin=1 init=hyb_gga_xc_hjs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_b88', 1.0), ('gga_x_hjs_b88', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[527, 527, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_HJS_B88', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 527 gga_x_hjs_b88 w=1.0 thr=1e-07/2.220446049250313e-16/4.641588833612784e-10/1e-20
+  - internal-struct: {"a": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05], "b": [-2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05, -2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05, -2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 527 gga_x_hjs_b88 w=-0.25 thr=1e-07/2.220446049250313e-16/4.641588833612784e-10/1e-20
+  - internal-struct: {"a": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05], "b": [-2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05, -2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05, -2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 431 hyb_gga_xc_hjs_b88 spin=2 init=hyb_gga_xc_hjs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_b88', 1.0), ('gga_x_hjs_b88', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[527, 527, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_HJS_B88', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 527 gga_x_hjs_b88 w=1.0 thr=1e-07/2.220446049250313e-16/4.641588833612784e-10/1e-20
+  - internal-struct: {"a": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05], "b": [-2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05, -2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05, -2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 527 gga_x_hjs_b88 w=-0.25 thr=1e-07/2.220446049250313e-16/4.641588833612784e-10/1e-20
+  - internal-struct: {"a": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05], "b": [-2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05, -2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.00968615, -0.0242498, 0.0259009, -0.0136606, 0.00309606, -7.32583e-05, -2.50356, 2.79656, -1.79401, 0.714888, -0.165924, 0.0118379, 0.0037806, -0.000157905, 1.45323e-06, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 432 hyb_gga_xc_hjs_b97x spin=1 init=hyb_gga_xc_hjs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_b97x', 1.0), ('gga_x_hjs_b97x', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[528, 528, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_HJS_B97X', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 528 gga_x_hjs_b97x w=1.0 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20
+  - internal-struct: {"a": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092], "b": [15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092, 15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092, 15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 528 gga_x_hjs_b97x w=-0.25 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20
+  - internal-struct: {"a": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092], "b": [15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092, 15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092, 15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 432 hyb_gga_xc_hjs_b97x spin=2 init=hyb_gga_xc_hjs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_b97x', 1.0), ('gga_x_hjs_b97x', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[528, 528, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_HJS_B97X', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 528 gga_x_hjs_b97x w=1.0 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20
+  - internal-struct: {"a": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092], "b": [15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092, 15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092, 15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 528 gga_x_hjs_b97x w=-0.25 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20
+  - internal-struct: {"a": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092], "b": [15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092, 15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0027355, 0.043297, -0.0669379, 0.069906, -0.0474635, 0.0153092, 15.8279, -26.8145, 17.8127, -5.98246, 1.25408, -0.270783, 0.0919536, -0.014096, 0.0045466, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 433 hyb_gga_xc_cam_b3lyp spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.35), ('gga_x_ityh', 0.46), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.35, 0.46, 0.18999999999999995, 0.81] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 0.65, -0.46] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.35 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.46 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 433 hyb_gga_xc_cam_b3lyp spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.35), ('gga_x_ityh', 0.46), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.35, 0.46, 0.18999999999999995, 0.81] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 0.65, -0.46] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.35 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.46 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 434 hyb_gga_xc_tuned_cam_b3lyp spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 0.9201), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.0, 0.9201, 0.18999999999999995, 0.81] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.15, 1.0, -0.9201] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.9201 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.15]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 434 hyb_gga_xc_tuned_cam_b3lyp spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 0.9201), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.0, 0.9201, 0.18999999999999995, 0.81] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.15, 1.0, -0.9201] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.9201 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.15]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 435 hyb_gga_xc_bhandh spin=1 init=xc_hyb_gga_xc_bhandh_init file=hyb_gga_xc_b1wc.c
+- aux=[('lda_x', 0.5), ('gga_c_lyp', 1.0)] mix=[0.5, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[1, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 435 hyb_gga_xc_bhandh spin=2 init=xc_hyb_gga_xc_bhandh_init file=hyb_gga_xc_b1wc.c
+- aux=[('lda_x', 0.5), ('gga_c_lyp', 1.0)] mix=[0.5, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[1, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 436 hyb_gga_xc_bhandhlyp spin=1 init=xc_hyb_gga_xc_bhandhlyp_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_b88', 0.5), ('gga_c_lyp', 1.0)] mix=[0.5, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[106, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 436 hyb_gga_xc_bhandhlyp spin=2 init=xc_hyb_gga_xc_bhandhlyp_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_b88', 0.5), ('gga_c_lyp', 1.0)] mix=[0.5, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[106, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 437 hyb_gga_xc_mb3lyp_rc04 spin=1 init=xc_hyb_gga_xc_mb3lyp_rc04_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_rc04', 0.5383), ('gga_c_lyp', 0.81)] mix=[0.08000000000000007, 0.72, 0.5383, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 27, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 27 lda_c_rc04 w=0.5383 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 437 hyb_gga_xc_mb3lyp_rc04 spin=2 init=xc_hyb_gga_xc_mb3lyp_rc04_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_rc04', 0.5383), ('gga_c_lyp', 0.81)] mix=[0.08000000000000007, 0.72, 0.5383, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 27, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 27 lda_c_rc04 w=0.5383 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 440 hyb_mgga_xc_b88b95 spin=1 init=xc_hyb_mgga_xc_b88b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b88', 0.72), ('mgga_c_bc95', 1.0)] mix=[0.72, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28
+- source-ids=[106, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 440 hyb_mgga_xc_b88b95 spin=2 init=xc_hyb_mgga_xc_b88b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b88', 0.72), ('mgga_c_bc95', 1.0)] mix=[0.72, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28
+- source-ids=[106, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 441 hyb_mgga_xc_b86b95 spin=1 init=xc_hyb_mgga_xc_b86b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b86', 0.72), ('mgga_c_bc95', 1.0)] mix=[0.72, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28
+- source-ids=[103, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 103 gga_x_b86 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.003868780689639527, "gamma": 0.004, "omega": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_omega"], "values": [0.003868780689639527, 0.004, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_omega"], "values": [0.003868780689639527, 0.004, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_omega']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 441 hyb_mgga_xc_b86b95 spin=2 init=xc_hyb_mgga_xc_b86b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b86', 0.72), ('mgga_c_bc95', 1.0)] mix=[0.72, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28
+- source-ids=[103, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 103 gga_x_b86 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.003868780689639527, "gamma": 0.004, "omega": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_omega"], "values": [0.003868780689639527, 0.004, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_omega"], "values": [0.003868780689639527, 0.004, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_omega']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 442 hyb_mgga_xc_pw86b95 spin=1 init=xc_hyb_mgga_xc_pw86b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_pw86', 0.71), ('mgga_c_bc95', 1.0)] mix=[0.71, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.29, 0.0] nlc=[0.0, 0.0] hyb_exx=0.29
+- source-ids=[108, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 108 gga_x_pw86 w=0.71 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"aa": 1.296, "bb": 14.0, "cc": 0.2}
+  - ext_effective: {"names": ["_aa", "_bb", "_cc"], "values": [1.296, 14.0, 0.2]}
+  - ext_standalone: {"names": ["_aa", "_bb", "_cc"], "values": [1.296, 14.0, 0.2]} overridden=[] at_default=['_aa', '_bb', '_cc']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 442 hyb_mgga_xc_pw86b95 spin=2 init=xc_hyb_mgga_xc_pw86b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_pw86', 0.71), ('mgga_c_bc95', 1.0)] mix=[0.71, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.29, 0.0] nlc=[0.0, 0.0] hyb_exx=0.29
+- source-ids=[108, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 108 gga_x_pw86 w=0.71 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"aa": 1.296, "bb": 14.0, "cc": 0.2}
+  - ext_effective: {"names": ["_aa", "_bb", "_cc"], "values": [1.296, 14.0, 0.2]}
+  - ext_standalone: {"names": ["_aa", "_bb", "_cc"], "values": [1.296, 14.0, 0.2]} overridden=[] at_default=['_aa', '_bb', '_cc']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 443 hyb_mgga_xc_bb1k spin=1 init=xc_hyb_mgga_xc_bb1k_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b88', 0.5800000000000001), ('mgga_c_bc95', 1.0)] mix=[0.5800000000000001, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.42, 0.0] nlc=[0.0, 0.0] hyb_exx=0.42
+- source-ids=[106, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 106 gga_x_b88 w=0.5800000000000001 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 443 hyb_mgga_xc_bb1k spin=2 init=xc_hyb_mgga_xc_bb1k_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b88', 0.5800000000000001), ('mgga_c_bc95', 1.0)] mix=[0.5800000000000001, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.42, 0.0] nlc=[0.0, 0.0] hyb_exx=0.42
+- source-ids=[106, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 106 gga_x_b88 w=0.5800000000000001 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 445 hyb_mgga_xc_mpw1b95 spin=1 init=xc_hyb_mgga_xc_mpw1b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_mpw91', 0.69), ('mgga_c_bc95', 1.0)] mix=[0.69, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.31, 0.0] nlc=[0.0, 0.0] hyb_exx=0.31
+- source-ids=[119, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 119 gga_x_mpw91 w=0.69 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 445 hyb_mgga_xc_mpw1b95 spin=2 init=xc_hyb_mgga_xc_mpw1b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_mpw91', 0.69), ('mgga_c_bc95', 1.0)] mix=[0.69, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.31, 0.0] nlc=[0.0, 0.0] hyb_exx=0.31
+- source-ids=[119, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 119 gga_x_mpw91 w=0.69 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 446 hyb_mgga_xc_mpwb1k spin=1 init=xc_hyb_mgga_xc_mpwb1k_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_mpw91', 0.56), ('mgga_c_bc95', 1.0)] mix=[0.56, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.44, 0.0] nlc=[0.0, 0.0] hyb_exx=0.44
+- source-ids=[119, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 119 gga_x_mpw91 w=0.56 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 446 hyb_mgga_xc_mpwb1k spin=2 init=xc_hyb_mgga_xc_mpwb1k_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_mpw91', 0.56), ('mgga_c_bc95', 1.0)] mix=[0.56, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.44, 0.0] nlc=[0.0, 0.0] hyb_exx=0.44
+- source-ids=[119, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 119 gga_x_mpw91 w=0.56 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 447 hyb_mgga_xc_x1b95 spin=1 init=xc_hyb_mgga_xc_x1b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b88', 0.5355), ('gga_x_pw91', 0.16449999999999998), ('mgga_c_bc95', 1.0)] mix=[0.5355, 0.16449999999999998, 1.0] naux=3 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.3, 0.0] nlc=[0.0, 0.0] hyb_exx=0.3
+- source-ids=[106, 109, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:(1.0 - a0)*a1', 'COEF-EVAL-FAIL:(1.0 - a0)*a2']
+- slot0 106 gga_x_b88 w=0.5355 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 109 gga_x_pw91 w=0.16449999999999998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19645, "b": 7.7956, "c": 0.2743, "d": -0.1508, "f": 0.004, "alpha": 100.0, "expo": 4.0}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_f', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 447 hyb_mgga_xc_x1b95 spin=2 init=xc_hyb_mgga_xc_x1b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b88', 0.5355), ('gga_x_pw91', 0.16449999999999998), ('mgga_c_bc95', 1.0)] mix=[0.5355, 0.16449999999999998, 1.0] naux=3 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.3, 0.0] nlc=[0.0, 0.0] hyb_exx=0.3
+- source-ids=[106, 109, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:(1.0 - a0)*a1', 'COEF-EVAL-FAIL:(1.0 - a0)*a2']
+- slot0 106 gga_x_b88 w=0.5355 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 109 gga_x_pw91 w=0.16449999999999998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19645, "b": 7.7956, "c": 0.2743, "d": -0.1508, "f": 0.004, "alpha": 100.0, "expo": 4.0}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_f', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 448 hyb_mgga_xc_xb1k spin=1 init=xc_hyb_mgga_xc_xb1k_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b88', 0.43605000000000005), ('gga_x_pw91', 0.13395), ('mgga_c_bc95', 1.0)] mix=[0.43605000000000005, 0.13395, 1.0] naux=3 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.43, 0.0] nlc=[0.0, 0.0] hyb_exx=0.43
+- source-ids=[106, 109, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:(1.0 - a0)*a1', 'COEF-EVAL-FAIL:(1.0 - a0)*a2']
+- slot0 106 gga_x_b88 w=0.43605000000000005 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 109 gga_x_pw91 w=0.13395 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19645, "b": 7.7956, "c": 0.2743, "d": -0.1508, "f": 0.004, "alpha": 100.0, "expo": 4.0}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_f', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 448 hyb_mgga_xc_xb1k spin=2 init=xc_hyb_mgga_xc_xb1k_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_b88', 0.43605000000000005), ('gga_x_pw91', 0.13395), ('mgga_c_bc95', 1.0)] mix=[0.43605000000000005, 0.13395, 1.0] naux=3 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.43, 0.0] nlc=[0.0, 0.0] hyb_exx=0.43
+- source-ids=[106, 109, 240] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:(1.0 - a0)*a1', 'COEF-EVAL-FAIL:(1.0 - a0)*a2']
+- slot0 106 gga_x_b88 w=0.43605000000000005 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 109 gga_x_pw91 w=0.13395 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19645, "b": 7.7956, "c": 0.2743, "d": -0.1508, "f": 0.004, "alpha": 100.0, "expo": 4.0}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_f", "_alpha", "_expo"], "values": [0.19645, 7.7956, 0.2743, -0.1508, 0.004, 100.0, 4.0]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_f', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot2 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.038, "copp": 0.0031}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=[] at_default=['_css', '_copp']
+  - cmp: partial:no-source-aux
+### 451 hyb_mgga_xc_pw6b95 spin=1 init=xc_hyb_mgga_xc_pw6b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_mpw91', 0.72), ('mgga_c_bc95', 1.0)] mix=[0.72, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28
+- source-ids=[119, 240] source-coefs=None source-aux={"0": [0.00538, 105.63156984148154, 3.8901], "1": [0.03668, 0.00262]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 119 gga_x_mpw91 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.2516404889123719, "b": 7.795554179441507, "c": 0.35135640502793386, "d": -0.22789961490447713, "f": 0.0031669820587625764, "alpha": 105.63156984148154, "expo": 3.8901}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00538, 105.63156984148154, 3.8901]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=['_bt', '_alpha', '_expo'] at_default=[]
+  - cmp: complete:full-match
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.03668, "copp": 0.00262}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.03668, 0.00262]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=['_css', '_copp'] at_default=[]
+  - cmp: complete:full-match
+### 451 hyb_mgga_xc_pw6b95 spin=2 init=xc_hyb_mgga_xc_pw6b95_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_mpw91', 0.72), ('mgga_c_bc95', 1.0)] mix=[0.72, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.28, 0.0] nlc=[0.0, 0.0] hyb_exx=0.28
+- source-ids=[119, 240] source-coefs=None source-aux={"0": [0.00538, 105.63156984148154, 3.8901], "1": [0.03668, 0.00262]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 119 gga_x_mpw91 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.2516404889123719, "b": 7.795554179441507, "c": 0.35135640502793386, "d": -0.22789961490447713, "f": 0.0031669820587625764, "alpha": 105.63156984148154, "expo": 3.8901}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00538, 105.63156984148154, 3.8901]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=['_bt', '_alpha', '_expo'] at_default=[]
+  - cmp: complete:full-match
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.03668, "copp": 0.00262}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.03668, 0.00262]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=['_css', '_copp'] at_default=[]
+  - cmp: complete:full-match
+### 452 hyb_mgga_xc_pwb6k spin=1 init=xc_hyb_mgga_xc_pwb6k_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_mpw91', 0.54), ('mgga_c_bc95', 1.0)] mix=[0.54, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.46, 0.0] nlc=[0.0, 0.0] hyb_exx=0.46
+- source-ids=[119, 240] source-coefs=None source-aux={"0": [0.00539, 103.778064560061, 4.0876], "1": [0.0412, 0.00353]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 119 gga_x_mpw91 w=0.54 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.25210822216313833, "b": 7.795554179441507, "c": 0.3520094838476884, "d": -0.22855269372423162, "f": 0.004751003872698516, "alpha": 103.778064560061, "expo": 4.0876}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00539, 103.778064560061, 4.0876]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=['_bt', '_alpha', '_expo'] at_default=[]
+  - cmp: complete:full-match
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.0412, "copp": 0.00353}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.0412, 0.00353]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=['_css', '_copp'] at_default=[]
+  - cmp: complete:full-match
+### 452 hyb_mgga_xc_pwb6k spin=2 init=xc_hyb_mgga_xc_pwb6k_init file=hyb_mgga_xc_b88b95.c
+- aux=[('gga_x_mpw91', 0.54), ('mgga_c_bc95', 1.0)] mix=[0.54, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.46, 0.0] nlc=[0.0, 0.0] hyb_exx=0.46
+- source-ids=[119, 240] source-coefs=None source-aux={"0": [0.00539, 103.778064560061, 4.0876], "1": [0.0412, 0.00353]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 119 gga_x_mpw91 w=0.54 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.25210822216313833, "b": 7.795554179441507, "c": 0.3520094838476884, "d": -0.22855269372423162, "f": 0.004751003872698516, "alpha": 103.778064560061, "expo": 4.0876}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00539, 103.778064560061, 4.0876]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=['_bt', '_alpha', '_expo'] at_default=[]
+  - cmp: complete:full-match
+- slot1 240 mgga_c_bc95 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"css": 0.0412, "copp": 0.00353}
+  - ext_effective: {"names": ["_css", "_copp"], "values": [0.0412, 0.00353]}
+  - ext_standalone: {"names": ["_css", "_copp"], "values": [0.038, 0.0031]} overridden=['_css', '_copp'] at_default=[]
+  - cmp: complete:full-match
+### 453 hyb_gga_xc_mpwlyp1m spin=1 init=xc_hyb_gga_xc_mpwlyp1m_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.95), ('gga_c_lyp', 1.0)] mix=[0.95, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.05, 0.0] nlc=[0.0, 0.0] hyb_exx=0.05
+- source-ids=[119, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.95 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 453 hyb_gga_xc_mpwlyp1m spin=2 init=xc_hyb_gga_xc_mpwlyp1m_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.95), ('gga_c_lyp', 1.0)] mix=[0.95, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.05, 0.0] nlc=[0.0, 0.0] hyb_exx=0.05
+- source-ids=[119, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.95 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 454 hyb_gga_xc_revb3lyp spin=1 init=xc_hyb_gga_xc_b3lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.13), ('gga_x_b88', 0.67), ('lda_c_vwn_rpa', 0.16000000000000003), ('gga_c_lyp', 0.84)] mix=[0.13, 0.67, 0.16000000000000003, 0.84] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.13 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.67 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.16000000000000003 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.84 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 454 hyb_gga_xc_revb3lyp spin=2 init=xc_hyb_gga_xc_b3lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.13), ('gga_x_b88', 0.67), ('lda_c_vwn_rpa', 0.16000000000000003), ('gga_c_lyp', 0.84)] mix=[0.13, 0.67, 0.16000000000000003, 0.84] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.13 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.67 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.16000000000000003 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.84 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 455 hyb_gga_xc_camy_blyp spin=1 init=xc_hyb_gga_xc_camy_blyp_init file=hyb_gga_xc_camy_blyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_sfat', 0.8), ('gga_c_lyp', 1.0)] mix=[0.0, 0.8, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.44, 1.0, -0.8] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 530, 131] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:1.0 - alpha', 'COEF-EVAL-FAIL:-beta']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 530 gga_x_sfat w=0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.44]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot2 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 455 hyb_gga_xc_camy_blyp spin=2 init=xc_hyb_gga_xc_camy_blyp_init file=hyb_gga_xc_camy_blyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_sfat', 0.8), ('gga_c_lyp', 1.0)] mix=[0.0, 0.8, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.44, 1.0, -0.8] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 530, 131] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:1.0 - alpha', 'COEF-EVAL-FAIL:-beta']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 530 gga_x_sfat w=0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.44]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot2 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 456 hyb_gga_xc_pbe0_13 spin=1 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.6666666666666667), ('gga_c_pbe', 1.0)] mix=[0.6666666666666667, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.3333333333333333, 0.0] nlc=[0.0, 0.0] hyb_exx=0.3333333333333333
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.6666666666666667 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 456 hyb_gga_xc_pbe0_13 spin=2 init=hyb_gga_xc_pbeh_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbe', 0.6666666666666667), ('gga_c_pbe', 1.0)] mix=[0.6666666666666667, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.3333333333333333, 0.0] nlc=[0.0, 0.0] hyb_exx=0.3333333333333333
+- source-ids=[101, 130] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.6666666666666667 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 457 hyb_mgga_xc_tpssh spin=1 init=hyb_mgga_xc_tpssh_init file=hyb_mgga_xc_tpssh.c
+- aux=[('mgga_x_tpss', 0.9), ('mgga_c_tpss', 1.0)] mix=[0.9, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1
+- source-ids=[202, 231] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 202 mgga_x_tpss w=0.9 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 231 mgga_c_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "d": 2.8, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=[] at_default=['_beta', '_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 457 hyb_mgga_xc_tpssh spin=2 init=hyb_mgga_xc_tpssh_init file=hyb_mgga_xc_tpssh.c
+- aux=[('mgga_x_tpss', 0.9), ('mgga_c_tpss', 1.0)] mix=[0.9, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1
+- source-ids=[202, 231] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 202 mgga_x_tpss w=0.9 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 231 mgga_c_tpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "d": 2.8, "C0_c": [0.53, 0.87, 0.5, 2.26]}
+  - ext_effective: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]}
+  - ext_standalone: {"names": ["_beta", "_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [0.06672455060314922, 2.8, 0.53, 0.87, 0.5, 2.26]} overridden=[] at_default=['_beta', '_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 458 hyb_mgga_xc_revtpssh spin=1 init=hyb_mgga_xc_revtpssh_init file=hyb_mgga_xc_tpssh.c
+- aux=[('mgga_x_revtpss', 0.9), ('mgga_c_revtpss', 1.0)] mix=[0.9, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1
+- source-ids=[212, 241] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 212 mgga_x_revtpss w=0.9 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 2.35203946, "e": 2.16769874, "kappa": 0.804, "tpss_mu": 0.14}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 2.35203946, 2.16769874, 0.804, 0.14]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 2.35203946, 2.16769874, 0.804, 0.14]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 241 mgga_c_revtpss w=1.0 thr=1e-13/2.220446049250313e-16/4.641588833612789e-18/1e-20
+  - internal-struct: {"d": 2.8, "C0_c": [0.59, 0.9269, 0.6225, 2.154]}
+  - ext_effective: {"names": ["_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [2.8, 0.59, 0.9269, 0.6225, 2.154]}
+  - ext_standalone: {"names": ["_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [2.8, 0.59, 0.9269, 0.6225, 2.154]} overridden=[] at_default=['_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 458 hyb_mgga_xc_revtpssh spin=2 init=hyb_mgga_xc_revtpssh_init file=hyb_mgga_xc_tpssh.c
+- aux=[('mgga_x_revtpss', 0.9), ('mgga_c_revtpss', 1.0)] mix=[0.9, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1
+- source-ids=[212, 241] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 212 mgga_x_revtpss w=0.9 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 2.35203946, "e": 2.16769874, "kappa": 0.804, "tpss_mu": 0.14}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 2.35203946, 2.16769874, 0.804, 0.14]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 2.35203946, 2.16769874, 0.804, 0.14]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 241 mgga_c_revtpss w=1.0 thr=1e-13/2.220446049250313e-16/4.641588833612789e-18/1e-20
+  - internal-struct: {"d": 2.8, "C0_c": [0.59, 0.9269, 0.6225, 2.154]}
+  - ext_effective: {"names": ["_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [2.8, 0.59, 0.9269, 0.6225, 2.154]}
+  - ext_standalone: {"names": ["_d", "_C0_c0", "_C0_c1", "_C0_c2", "_C0_c3"], "values": [2.8, 0.59, 0.9269, 0.6225, 2.154]} overridden=[] at_default=['_d', '_C0_c0', '_C0_c1', '_C0_c2', '_C0_c3']
+  - cmp: partial:no-source-aux
+### 459 hyb_gga_xc_b3lyps spin=1 init=xc_hyb_gga_xc_b3lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.13), ('gga_x_b88', 0.72), ('lda_c_vwn_rpa', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.13, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.15, 0.0] nlc=[0.0, 0.0] hyb_exx=0.15
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.13 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 459 hyb_gga_xc_b3lyps spin=2 init=xc_hyb_gga_xc_b3lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.13), ('gga_x_b88', 0.72), ('lda_c_vwn_rpa', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.13, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.15, 0.0] nlc=[0.0, 0.0] hyb_exx=0.15
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.13 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 460 hyb_gga_xc_qtp17 spin=1 init=xc_hyb_gga_xc_kmlyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.38), ('lda_c_vwn_rpa', 0.19999999999999996), ('gga_c_lyp', 0.8)] mix=[0.38, 0.19999999999999996, 0.8] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.62, 0.0] nlc=[0.0, 0.0] hyb_exx=0.62
+- source-ids=[1, 8, 131] source-coefs=[0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.38 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 8 lda_c_vwn_rpa w=0.19999999999999996 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot2 131 gga_c_lyp w=0.8 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 460 hyb_gga_xc_qtp17 spin=2 init=xc_hyb_gga_xc_kmlyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.38), ('lda_c_vwn_rpa', 0.19999999999999996), ('gga_c_lyp', 0.8)] mix=[0.38, 0.19999999999999996, 0.8] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.62, 0.0] nlc=[0.0, 0.0] hyb_exx=0.62
+- source-ids=[1, 8, 131] source-coefs=[0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.38 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 8 lda_c_vwn_rpa w=0.19999999999999996 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot2 131 gga_c_lyp w=0.8 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 461 hyb_gga_xc_b3lyp_mcm1 spin=1 init=xc_hyb_gga_xc_b3lyp_mcm_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.1319999999999999), ('gga_x_b88', 0.6709), ('lda_c_vwn_rpa', -0.17790000000000006), ('gga_c_lyp', 1.1383)] mix=[0.1319999999999999, 0.6709, -0.17790000000000006, 1.1383] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1986, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1986
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.1319999999999999 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.6709 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=-0.17790000000000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=1.1383 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 461 hyb_gga_xc_b3lyp_mcm1 spin=2 init=xc_hyb_gga_xc_b3lyp_mcm_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.1319999999999999), ('gga_x_b88', 0.6709), ('lda_c_vwn_rpa', -0.17790000000000006), ('gga_c_lyp', 1.1383)] mix=[0.1319999999999999, 0.6709, -0.17790000000000006, 1.1383] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1986, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1986
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.1319999999999999 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.6709 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=-0.17790000000000006 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=1.1383 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 462 hyb_gga_xc_b3lyp_mcm2 spin=1 init=xc_hyb_gga_xc_b3lyp_mcm_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.07900000000000007), ('gga_x_b88', 0.729), ('lda_c_vwn_rpa', 0.016799999999999926), ('gga_c_lyp', 0.9421)] mix=[0.07900000000000007, 0.729, 0.016799999999999926, 0.9421] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2228, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2228
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.07900000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.729 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.016799999999999926 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.9421 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 462 hyb_gga_xc_b3lyp_mcm2 spin=2 init=xc_hyb_gga_xc_b3lyp_mcm_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.07900000000000007), ('gga_x_b88', 0.729), ('lda_c_vwn_rpa', 0.016799999999999926), ('gga_c_lyp', 0.9421)] mix=[0.07900000000000007, 0.729, 0.016799999999999926, 0.9421] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2228, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2228
+- source-ids=[1, 106, 8, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.07900000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.729 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.016799999999999926 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.9421 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 465 hyb_gga_xc_lrc_wpbeh spin=1 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 0.8), ('gga_c_pbe', 1.0)] mix=[0.8, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.2, 1.0, -0.8] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=0.8 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.2]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 465 hyb_gga_xc_lrc_wpbeh spin=2 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 0.8), ('gga_c_pbe', 1.0)] mix=[0.8, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.2, 1.0, -0.8] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=0.8 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.2]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 467 hyb_gga_xc_lcy_pbe spin=1 init=xc_hyb_gga_xc_lcy_pbe_init file=hyb_gga_xc_lcy_pbe.c
+- aux=[('gga_x_sfat_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.75, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[601, 130] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 601 gga_x_sfat_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.75]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 467 hyb_gga_xc_lcy_pbe spin=2 init=xc_hyb_gga_xc_lcy_pbe_init file=hyb_gga_xc_lcy_pbe.c
+- aux=[('gga_x_sfat_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.75, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[601, 130] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 601 gga_x_sfat_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.75]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 468 hyb_gga_xc_lcy_blyp spin=1 init=xc_hyb_gga_xc_lcy_blyp_init file=hyb_gga_xc_lcy_blyp.c
+- aux=[('gga_x_sfat', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.75, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[530, 131] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 530 gga_x_sfat w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.75]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 468 hyb_gga_xc_lcy_blyp spin=2 init=xc_hyb_gga_xc_lcy_blyp_init file=hyb_gga_xc_lcy_blyp.c
+- aux=[('gga_x_sfat', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.75, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[530, 131] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 530 gga_x_sfat w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.75]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 469 hyb_gga_xc_lc_vv10 spin=1 init=hyb_gga_xc_lc_vv10_init file=gga_xc_vv10.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.45, 1.0, -1.0] nlc=[6.3, 0.0089] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.45]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 469 hyb_gga_xc_lc_vv10 spin=2 init=hyb_gga_xc_lc_vv10_init file=gga_xc_vv10.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.45, 1.0, -1.0] nlc=[6.3, 0.0089] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.45]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 470 hyb_gga_xc_camy_b3lyp spin=1 init=xc_hyb_gga_xc_camy_b3lyp_init file=hyb_gga_xc_camy_b3lyp.c
+- aux=[('gga_x_b88', 0.35), ('gga_x_sfat', 0.46), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.35, 0.46, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.34, 0.65, -0.46] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 530, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.35 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 530 gga_x_sfat w=0.46 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.34]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 470 hyb_gga_xc_camy_b3lyp spin=2 init=xc_hyb_gga_xc_camy_b3lyp_init file=hyb_gga_xc_camy_b3lyp.c
+- aux=[('gga_x_b88', 0.35), ('gga_x_sfat', 0.46), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.35, 0.46, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.34, 0.65, -0.46] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 530, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.35 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 530 gga_x_sfat w=0.46 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.34]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 472 hyb_gga_xc_hpbeint spin=1 init=hyb_gga_xc_hpbeint_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbeint', 0.8333333333333334), ('gga_c_pbeint', 1.0)] mix=[0.8333333333333334, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.16666666666666666, 0.0] nlc=[0.0, 0.0] hyb_exx=0.16666666666666666
+- source-ids=[60, 62] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 60 gga_x_pbeint w=0.8333333333333334 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"kappa": 0.804, "alpha": 0.197, "muPBE": 0.2195149727645171, "muGE": 0.12345679012345678}
+  - ext_effective: {"names": ["_kappa", "_alpha", "_muPBE", "_muGE"], "values": [0.804, 0.197, 0.2195149727645171, 0.12345679012345678]}
+  - ext_standalone: {"names": ["_kappa", "_alpha", "_muPBE", "_muGE"], "values": [0.804, 0.197, 0.2195149727645171, 0.12345679012345678]} overridden=[] at_default=['_kappa', '_alpha', '_muPBE', '_muGE']
+  - cmp: partial:no-source-aux
+- slot1 62 gga_c_pbeint w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.052, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.052, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.052, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 472 hyb_gga_xc_hpbeint spin=2 init=hyb_gga_xc_hpbeint_init file=hyb_gga_xc_pbeh.c
+- aux=[('gga_x_pbeint', 0.8333333333333334), ('gga_c_pbeint', 1.0)] mix=[0.8333333333333334, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.16666666666666666, 0.0] nlc=[0.0, 0.0] hyb_exx=0.16666666666666666
+- source-ids=[60, 62] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 60 gga_x_pbeint w=0.8333333333333334 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"kappa": 0.804, "alpha": 0.197, "muPBE": 0.2195149727645171, "muGE": 0.12345679012345678}
+  - ext_effective: {"names": ["_kappa", "_alpha", "_muPBE", "_muGE"], "values": [0.804, 0.197, 0.2195149727645171, 0.12345679012345678]}
+  - ext_standalone: {"names": ["_kappa", "_alpha", "_muPBE", "_muGE"], "values": [0.804, 0.197, 0.2195149727645171, 0.12345679012345678]} overridden=[] at_default=['_kappa', '_alpha', '_muPBE', '_muGE']
+  - cmp: partial:no-source-aux
+- slot1 62 gga_c_pbeint w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.052, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.052, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.052, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 473 hyb_gga_xc_lrc_wpbe spin=1 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.3, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.3]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 473 hyb_gga_xc_lrc_wpbe spin=2 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.3, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.3]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 474 hyb_mgga_x_mvsh spin=1 init=hyb_mgga_x_mvsh_init file=hyb_mgga_x_mvsh.c
+- aux=[('mgga_x_mvs', 0.75)] mix=[0.75] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[257] source-coefs=[0.75] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 257 mgga_x_mvs w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"e1": -1.6665, "c1": 0.7438, "k0": 0.174, "b": 0.0233}
+  - ext_effective: {"names": ["_e1", "_c1", "_k0", "_b"], "values": [-1.6665, 0.7438, 0.174, 0.0233]}
+  - ext_standalone: {"names": ["_e1", "_c1", "_k0", "_b"], "values": [-1.6665, 0.7438, 0.174, 0.0233]} overridden=[] at_default=['_e1', '_c1', '_k0', '_b']
+  - cmp: partial:no-source-aux
+### 474 hyb_mgga_x_mvsh spin=2 init=hyb_mgga_x_mvsh_init file=hyb_mgga_x_mvsh.c
+- aux=[('mgga_x_mvs', 0.75)] mix=[0.75] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[257] source-coefs=[0.75] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 257 mgga_x_mvs w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"e1": -1.6665, "c1": 0.7438, "k0": 0.174, "b": 0.0233}
+  - ext_effective: {"names": ["_e1", "_c1", "_k0", "_b"], "values": [-1.6665, 0.7438, 0.174, 0.0233]}
+  - ext_standalone: {"names": ["_e1", "_c1", "_k0", "_b"], "values": [-1.6665, 0.7438, 0.174, 0.0233]} overridden=[] at_default=['_e1', '_c1', '_k0', '_b']
+  - cmp: partial:no-source-aux
+### 475 hyb_gga_xc_b3lyp5 spin=1 init=xc_hyb_gga_xc_b3lyp5_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 475 hyb_gga_xc_b3lyp5 spin=2 init=xc_hyb_gga_xc_b3lyp5_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000007), ('gga_x_b88', 0.72), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.08000000000000007, 0.72, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[1, 106, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000007 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.72 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 476 hyb_gga_xc_edf2 spin=1 init=hyb_gga_xc_edf2_init file=hyb_gga_xc_edf2.c
+- aux=[('lda_x', 0.2811), ('gga_x_b88', 0.6227), ('gga_x_b88', -0.0551), ('lda_c_vwn', 0.3029), ('gga_c_lyp', 0.5998), ('gga_c_lyp', -0.0053)] mix=[0.2811, 0.6227, -0.0551, 0.3029, 0.5998, -0.0053] naux=6 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1695, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1695
+- source-ids=[1, 106, 106, 7, 131, 131] source-coefs=[0.2811, 0.6227, -0.0551, 0.3029, 0.5998, -0.0053] source-aux={"2": [0.0035, 6.0], "5": [0.055, 0.158, 0.25, 0.3505]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.2811 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.6227 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 106 gga_x_b88 w=-0.0551 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0035, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0035, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=['_beta'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot3 7 lda_c_vwn w=0.3029 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot4 131 gga_c_lyp w=0.5998 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+- slot5 131 gga_c_lyp w=-0.0053 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.055, "b": 0.158, "c": 0.25, "d": 0.3505}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.055, 0.158, 0.25, 0.3505]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=['_a', '_b', '_c', '_d'] at_default=[]
+  - cmp: complete:full-match
+### 476 hyb_gga_xc_edf2 spin=2 init=hyb_gga_xc_edf2_init file=hyb_gga_xc_edf2.c
+- aux=[('lda_x', 0.2811), ('gga_x_b88', 0.6227), ('gga_x_b88', -0.0551), ('lda_c_vwn', 0.3029), ('gga_c_lyp', 0.5998), ('gga_c_lyp', -0.0053)] mix=[0.2811, 0.6227, -0.0551, 0.3029, 0.5998, -0.0053] naux=6 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1695, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1695
+- source-ids=[1, 106, 106, 7, 131, 131] source-coefs=[0.2811, 0.6227, -0.0551, 0.3029, 0.5998, -0.0053] source-aux={"2": [0.0035, 6.0], "5": [0.055, 0.158, 0.25, 0.3505]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.2811 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.6227 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 106 gga_x_b88 w=-0.0551 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0035, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0035, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=['_beta'] at_default=['_gamma']
+  - cmp: complete:full-match
+- slot3 7 lda_c_vwn w=0.3029 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot4 131 gga_c_lyp w=0.5998 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+- slot5 131 gga_c_lyp w=-0.0053 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.055, "b": 0.158, "c": 0.25, "d": 0.3505}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.055, 0.158, 0.25, 0.3505]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=['_a', '_b', '_c', '_d'] at_default=[]
+  - cmp: complete:full-match
+### 477 hyb_gga_xc_cap0 spin=1 init=xc_hyb_gga_xc_cap0_init file=gga_x_cap.c
+- aux=[('gga_x_cap', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[270, 130] source-coefs=[0.75, 1.0] source-aux={"1": [0.050043412952361914, "DEFAULT", "DEFAULT", "DEFAULT"]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 270 gga_x_cap w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alphaoAx": -0.2195149727645171, "c": 0.05240533950570443}
+  - ext_effective: {"names": ["_alphaoAx", "_c"], "values": [-0.2195149727645171, 0.05240533950570443]}
+  - ext_standalone: {"names": ["_alphaoAx", "_c"], "values": [-0.2195149727645171, 0.05240533950570443]} overridden=[] at_default=['_alphaoAx', '_c']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.050043412952361914, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.050043412952361914, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+### 477 hyb_gga_xc_cap0 spin=2 init=xc_hyb_gga_xc_cap0_init file=gga_x_cap.c
+- aux=[('gga_x_cap', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[270, 130] source-coefs=[0.75, 1.0] source-aux={"1": [0.050043412952361914, "DEFAULT", "DEFAULT", "DEFAULT"]} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 270 gga_x_cap w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alphaoAx": -0.2195149727645171, "c": 0.05240533950570443}
+  - ext_effective: {"names": ["_alphaoAx", "_c"], "values": [-0.2195149727645171, 0.05240533950570443]}
+  - ext_standalone: {"names": ["_alphaoAx", "_c"], "values": [-0.2195149727645171, 0.05240533950570443]} overridden=[] at_default=['_alphaoAx', '_c']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.050043412952361914, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.050043412952361914, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=['_beta'] at_default=['_gamma', '_B', '_tscale']
+  - cmp: complete:lead-slots-match+3-DEFAULT-filled-by-info-defaults
+### 478 hyb_gga_xc_lc_wpbe spin=1 init=hyb_gga_xc_lc_wpbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.4, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.4]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 478 hyb_gga_xc_lc_wpbe spin=2 init=hyb_gga_xc_lc_wpbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.4, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.4]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 479 hyb_gga_xc_hse12 spin=1 init=hyb_gga_xc_hse_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_x_wpbeh', -0.313), ('gga_c_pbe', 1.0)] mix=[1.0, -0.313, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0978977840165, 0.0, 0.313] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 524, 130] source-coefs=[1.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot1 524 gga_x_wpbeh w=-0.313 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0978977840165]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 479 hyb_gga_xc_hse12 spin=2 init=hyb_gga_xc_hse_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_x_wpbeh', -0.313), ('gga_c_pbe', 1.0)] mix=[1.0, -0.313, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0978977840165, 0.0, 0.313] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 524, 130] source-coefs=[1.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot1 524 gga_x_wpbeh w=-0.313 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0978977840165]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 480 hyb_gga_xc_hse12s spin=1 init=hyb_gga_xc_hse_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_x_wpbeh', -0.425), ('gga_c_pbe', 1.0)] mix=[1.0, -0.425, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.2159043020472, 0.0, 0.425] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 524, 130] source-coefs=[1.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot1 524 gga_x_wpbeh w=-0.425 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.2159043020472]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 480 hyb_gga_xc_hse12s spin=2 init=hyb_gga_xc_hse_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_wpbeh', 1.0), ('gga_x_wpbeh', -0.425), ('gga_c_pbe', 1.0)] mix=[1.0, -0.425, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.2159043020472, 0.0, 0.425] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[524, 524, 130] source-coefs=[1.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 524 gga_x_wpbeh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.0]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=[] at_default=['_omega']
+  - cmp: partial:no-source-aux
+- slot1 524 gga_x_wpbeh w=-0.425 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.2159043020472]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.0]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 481 hyb_gga_xc_hse_sol spin=1 init=hyb_gga_xc_hse_sol_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe_sol', 1.0), ('gga_x_hjs_pbe_sol', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[526, 526, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 526 gga_x_hjs_pbe_sol w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 526 gga_x_hjs_pbe_sol w=-0.25 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 481 hyb_gga_xc_hse_sol spin=2 init=hyb_gga_xc_hse_sol_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe_sol', 1.0), ('gga_x_hjs_pbe_sol', -0.25), ('gga_c_pbe', 1.0)] mix=[1.0, -0.25, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.11, 0.0, 0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[526, 526, 130] source-coefs=[1.0, -0.25, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 526 gga_x_hjs_pbe_sol w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.0]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 526 gga_x_hjs_pbe_sol w=-0.25 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=[] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8', '_omega']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 482 hyb_gga_xc_cam_qtp_01 spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 0.77), ('lda_c_vwn', 0.19999999999999996), ('gga_c_lyp', 0.8)] mix=[0.0, 0.77, 0.19999999999999996, 0.8] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.31, 1.0, -0.77] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.77 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.31]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.19999999999999996 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.8 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 482 hyb_gga_xc_cam_qtp_01 spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 0.77), ('lda_c_vwn', 0.19999999999999996), ('gga_c_lyp', 0.8)] mix=[0.0, 0.77, 0.19999999999999996, 0.8] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.31, 1.0, -0.77] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.77 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.31]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.19999999999999996 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.8 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 483 hyb_gga_xc_mpw1lyp spin=1 init=xc_hyb_gga_xc_mpw1pw_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.75), ('gga_c_lyp', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[119, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_MPW1LYP', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 483 hyb_gga_xc_mpw1lyp spin=2 init=xc_hyb_gga_xc_mpw1pw_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.75), ('gga_c_lyp', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[119, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_MPW1LYP', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 484 hyb_gga_xc_mpw1pbe spin=1 init=xc_hyb_gga_xc_mpw1pw_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[119, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_MPW1PBE', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 484 hyb_gga_xc_mpw1pbe spin=2 init=xc_hyb_gga_xc_mpw1pw_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_mpw91', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[119, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['SWITCH-CASE:XC_HYB_GGA_XC_MPW1PBE', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 119 gga_x_mpw91 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 485 hyb_gga_xc_kmlyp spin=1 init=xc_hyb_gga_xc_kmlyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.44299999999999995), ('lda_c_vwn_rpa', 0.552), ('gga_c_lyp', 0.448)] mix=[0.44299999999999995, 0.552, 0.448] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.557, 0.0] nlc=[0.0, 0.0] hyb_exx=0.557
+- source-ids=[1, 8, 131] source-coefs=[0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.44299999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 8 lda_c_vwn_rpa w=0.552 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot2 131 gga_c_lyp w=0.448 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 485 hyb_gga_xc_kmlyp spin=2 init=xc_hyb_gga_xc_kmlyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.44299999999999995), ('lda_c_vwn_rpa', 0.552), ('gga_c_lyp', 0.448)] mix=[0.44299999999999995, 0.552, 0.448] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.557, 0.0] nlc=[0.0, 0.0] hyb_exx=0.557
+- source-ids=[1, 8, 131] source-coefs=[0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.44299999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 8 lda_c_vwn_rpa w=0.552 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot2 131 gga_c_lyp w=0.448 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 486 hyb_gga_xc_lc_wpbe_whs spin=1 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.4, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.4]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 486 hyb_gga_xc_lc_wpbe_whs spin=2 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.4, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.4]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 487 hyb_gga_xc_lc_wpbeh_whs spin=1 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.4, 1.0, -0.75] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=0.75 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.4]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 487 hyb_gga_xc_lc_wpbeh_whs spin=2 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 0.75), ('gga_c_pbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.4, 1.0, -0.75] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=0.75 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.4]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 488 hyb_gga_xc_lc_wpbe08_whs spin=1 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.45, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.45]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 488 hyb_gga_xc_lc_wpbe08_whs spin=2 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 1.0), ('gga_c_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.45, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.45]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 489 hyb_gga_xc_lc_wpbesol_whs spin=1 init=hyb_gga_xc_lc_wpbesol_whs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe_sol', 1.0), ('gga_c_pbe_sol', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.6, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[526, 133] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 526 gga_x_hjs_pbe_sol w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.6]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 133 gga_c_pbe_sol w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.046, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.046, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.046, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 489 hyb_gga_xc_lc_wpbesol_whs spin=2 init=hyb_gga_xc_lc_wpbesol_whs_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe_sol', 1.0), ('gga_c_pbe_sol', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.6, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[526, 133] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 526 gga_x_hjs_pbe_sol w=1.0 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721], "b": [8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.6]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0047333, 0.0403304, -0.0574615, 0.0435395, -0.0216251, 0.0063721, 8.52056, -13.9885, 9.28583, -3.27287, 0.843499, -0.235543, 0.0847074, -0.0171561, 0.0050552, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 133 gga_c_pbe_sol w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.046, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.046, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.046, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 490 hyb_gga_xc_cam_qtp_00 spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.08999999999999997), ('gga_x_ityh', 0.37), ('lda_c_vwn', 0.19999999999999996), ('gga_c_lyp', 0.8)] mix=[0.08999999999999997, 0.37, 0.19999999999999996, 0.8] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.29, 0.91, -0.37] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.08999999999999997 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.37 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.29]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.19999999999999996 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.8 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 490 hyb_gga_xc_cam_qtp_00 spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.08999999999999997), ('gga_x_ityh', 0.37), ('lda_c_vwn', 0.19999999999999996), ('gga_c_lyp', 0.8)] mix=[0.08999999999999997, 0.37, 0.19999999999999996, 0.8] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.29, 0.91, -0.37] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.08999999999999997 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.37 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.29]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.19999999999999996 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.8 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 491 hyb_gga_xc_cam_qtp_02 spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 0.72), ('lda_c_vwn', 0.0), ('gga_c_lyp', 1.0)] mix=[0.0, 0.72, 0.0, 1.0] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.335, 1.0, -0.72] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.72 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.335]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 491 hyb_gga_xc_cam_qtp_02 spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 0.72), ('lda_c_vwn', 0.0), ('gga_c_lyp', 1.0)] mix=[0.0, 0.72, 0.0, 1.0] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.335, 1.0, -0.72] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.72 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.335]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 492 hyb_gga_xc_lc_qtp spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 1.0), ('lda_c_vwn', 0.0), ('gga_c_lyp', 1.0)] mix=[0.0, 1.0, 0.0, 1.0] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.475, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.475]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 492 hyb_gga_xc_lc_qtp spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.0), ('gga_x_ityh', 1.0), ('lda_c_vwn', 0.0), ('gga_c_lyp', 1.0)] mix=[0.0, 1.0, 0.0, 1.0] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.475, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.475]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 499 hyb_gga_xc_blyp35 spin=1 init=xc_hyb_gga_xc_blyp35_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_b88', 0.65), ('gga_c_lyp', 1.0)] mix=[0.65, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.35, 0.0] nlc=[0.0, 0.0] hyb_exx=0.35
+- source-ids=[106, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.65 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 499 hyb_gga_xc_blyp35 spin=2 init=xc_hyb_gga_xc_blyp35_init file=hyb_gga_xc_b1wc.c
+- aux=[('gga_x_b88', 0.65), ('gga_c_lyp', 1.0)] mix=[0.65, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.35, 0.0] nlc=[0.0, 0.0] hyb_exx=0.35
+- source-ids=[106, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.65 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 544 gga_x_kgg99 spin=1 init=gga_x_kgg_init file=gga_x_gg99.c
+- aux=[('lda_x', -0.05050908122584938), ('gga_x_gg99', 1.0)] mix=[-0.05050908122584938, 1.0] naux=2 thr=5e-07/2.220446049250313e-16/3.968502629920503e-09/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 535] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 1 lda_x w=-0.05050908122584938 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 535 gga_x_gg99 w=1.0 thr=5e-07/2.220446049250313e-16/3.968502629920503e-09/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 544 gga_x_kgg99 spin=2 init=gga_x_kgg_init file=gga_x_gg99.c
+- aux=[('lda_x', -0.05050908122584938), ('gga_x_gg99', 1.0)] mix=[-0.05050908122584938, 1.0] naux=2 thr=5e-07/2.220446049250313e-16/3.968502629920503e-09/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 535] source-coefs=None source-aux={} notes=['NONLIT-COEF-ARRAY']
+- slot0 1 lda_x w=-0.05050908122584938 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 535 gga_x_gg99 w=1.0 thr=5e-07/2.220446049250313e-16/3.968502629920503e-09/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 563 hyb_mgga_xc_b0kcis spin=1 init=xc_hyb_mgga_xc_b0kcis_init file=mgga_c_kcis.c
+- aux=[('gga_x_b88', 0.75), ('mgga_c_kcis', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[106, 562] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 106 gga_x_b88 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 563 hyb_mgga_xc_b0kcis spin=2 init=xc_hyb_mgga_xc_b0kcis_init file=mgga_c_kcis.c
+- aux=[('gga_x_b88', 0.75), ('mgga_c_kcis', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[106, 562] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NONLIT-COEF-ARRAY']
+- slot0 106 gga_x_b88 w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 566 hyb_mgga_xc_mpw1kcis spin=1 init=hyb_mgga_xc_kcis_init file=hyb_mgga_xc_kcis.c
+- aux=[('gga_x_mpw91', 0.85), ('mgga_c_kcis', 1.0)] mix=[0.85, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.15, 0.0] nlc=[0.0, 0.0] hyb_exx=0.15
+- source-ids=None source-coefs=None source-aux={} notes=['SWITCH-CASE:XC_HYB_MGGA_XC_MPW1KCIS', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NO-funcs_id', 'COEF-EVAL-FAIL:1.0 - exx']
+- slot0 119 gga_x_mpw91 w=0.85 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 566 hyb_mgga_xc_mpw1kcis spin=2 init=hyb_mgga_xc_kcis_init file=hyb_mgga_xc_kcis.c
+- aux=[('gga_x_mpw91', 0.85), ('mgga_c_kcis', 1.0)] mix=[0.85, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.15, 0.0] nlc=[0.0, 0.0] hyb_exx=0.15
+- source-ids=None source-coefs=None source-aux={} notes=['SWITCH-CASE:XC_HYB_MGGA_XC_MPW1KCIS', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NO-funcs_id', 'COEF-EVAL-FAIL:1.0 - exx']
+- slot0 119 gga_x_mpw91 w=0.85 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 567 hyb_mgga_xc_mpwkcis1k spin=1 init=hyb_mgga_xc_kcis_init file=hyb_mgga_xc_kcis.c
+- aux=[('gga_x_mpw91', 0.5900000000000001), ('mgga_c_kcis', 1.0)] mix=[0.5900000000000001, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.41, 0.0] nlc=[0.0, 0.0] hyb_exx=0.41
+- source-ids=None source-coefs=None source-aux={} notes=['SWITCH-CASE:XC_HYB_MGGA_XC_MPWKCIS1K', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NO-funcs_id', 'COEF-EVAL-FAIL:1.0 - exx']
+- slot0 119 gga_x_mpw91 w=0.5900000000000001 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 567 hyb_mgga_xc_mpwkcis1k spin=2 init=hyb_mgga_xc_kcis_init file=hyb_mgga_xc_kcis.c
+- aux=[('gga_x_mpw91', 0.5900000000000001), ('mgga_c_kcis', 1.0)] mix=[0.5900000000000001, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.41, 0.0] nlc=[0.0, 0.0] hyb_exx=0.41
+- source-ids=None source-coefs=None source-aux={} notes=['SWITCH-CASE:XC_HYB_MGGA_XC_MPWKCIS1K', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NO-funcs_id', 'COEF-EVAL-FAIL:1.0 - exx']
+- slot0 119 gga_x_mpw91 w=0.5900000000000001 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 0.19925436482652492, "b": 7.795554179441507, "c": 0.27821157721542716, "d": -0.15475478709197044, "f": 0.002233276157114453, "alpha": 100.0, "expo": 3.72}
+  - ext_effective: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]}
+  - ext_standalone: {"names": ["_bt", "_alpha", "_expo"], "values": [0.00426, 100.0, 3.72]} overridden=[] at_default=['_bt', '_alpha', '_expo']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 568 hyb_mgga_xc_pbe1kcis spin=1 init=hyb_mgga_xc_kcis_init file=hyb_mgga_xc_kcis.c
+- aux=[('gga_x_pbe', 0.78), ('mgga_c_kcis', 1.0)] mix=[0.78, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22
+- source-ids=None source-coefs=None source-aux={} notes=['SWITCH-CASE:XC_HYB_MGGA_XC_PBE1KCIS', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NO-funcs_id', 'COEF-EVAL-FAIL:1.0 - exx']
+- slot0 101 gga_x_pbe w=0.78 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 568 hyb_mgga_xc_pbe1kcis spin=2 init=hyb_mgga_xc_kcis_init file=hyb_mgga_xc_kcis.c
+- aux=[('gga_x_pbe', 0.78), ('mgga_c_kcis', 1.0)] mix=[0.78, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22
+- source-ids=None source-coefs=None source-aux={} notes=['SWITCH-CASE:XC_HYB_MGGA_XC_PBE1KCIS', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NO-funcs_id', 'COEF-EVAL-FAIL:1.0 - exx']
+- slot0 101 gga_x_pbe w=0.78 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 569 hyb_mgga_xc_tpss1kcis spin=1 init=hyb_mgga_xc_kcis_init file=hyb_mgga_xc_kcis.c
+- aux=[('mgga_x_tpss', 0.87), ('mgga_c_kcis', 1.0)] mix=[0.87, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.13, 0.0] nlc=[0.0, 0.0] hyb_exx=0.13
+- source-ids=None source-coefs=None source-aux={} notes=['SWITCH-CASE:XC_HYB_MGGA_XC_TPSS1KCIS', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NO-funcs_id', 'COEF-EVAL-FAIL:1.0 - exx']
+- slot0 202 mgga_x_tpss w=0.87 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 569 hyb_mgga_xc_tpss1kcis spin=2 init=hyb_mgga_xc_kcis_init file=hyb_mgga_xc_kcis.c
+- aux=[('mgga_x_tpss', 0.87), ('mgga_c_kcis', 1.0)] mix=[0.87, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.13, 0.0] nlc=[0.0, 0.0] hyb_exx=0.13
+- source-ids=None source-coefs=None source-aux={} notes=['SWITCH-CASE:XC_HYB_MGGA_XC_TPSS1KCIS', 'HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'NO-funcs_id', 'COEF-EVAL-FAIL:1.0 - exx']
+- slot0 202 mgga_x_tpss w=0.87 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"b": 0.4, "c": 1.59096, "e": 1.537, "kappa": 0.804, "tpss_mu": 0.21951}
+  - ext_effective: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]}
+  - ext_standalone: {"names": ["_b", "_c", "_e", "_kappa", "_mu"], "values": [0.4, 1.59096, 1.537, 0.804, 0.21951]} overridden=[] at_default=['_b', '_c', '_e', '_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 562 mgga_c_kcis w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 572 hyb_gga_xc_b5050lyp spin=1 init=xc_hyb_gga_xc_b5050lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000002), ('gga_x_b88', 0.42), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.08000000000000002, 0.42, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[1, 106, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000002 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.42 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 572 hyb_gga_xc_b5050lyp spin=2 init=xc_hyb_gga_xc_b5050lyp_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.08000000000000002), ('gga_x_b88', 0.42), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.08000000000000002, 0.42, 0.18999999999999995, 0.81] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[1, 106, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=0.08000000000000002 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.42 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 583 hyb_mgga_x_revscan0 spin=1 init=hyb_mgga_x_revscan0_init file=mgga_x_scan.c
+- aux=[('mgga_x_revscan', 0.75)] mix=[0.75] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[581] source-coefs=[0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 581 mgga_x_revscan w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT AMBI:hyb_mgga_x_scan0_params,mgga_x_scan_params (internal struct unread; effective EXT above is authoritative)
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1"], "values": [0.607, 0.7, 1.37, 0.065]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1"], "values": [0.607, 0.7, 1.37, 0.065]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1']
+  - cmp: partial:no-source-aux ext_fallback(src-only)="NO-SOURCE-AUX-PARSED:NO-SOURCE-AUX"
+### 583 hyb_mgga_x_revscan0 spin=2 init=hyb_mgga_x_revscan0_init file=mgga_x_scan.c
+- aux=[('mgga_x_revscan', 0.75)] mix=[0.75] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[581] source-coefs=[0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 581 mgga_x_revscan w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT AMBI:hyb_mgga_x_scan0_params,mgga_x_scan_params (internal struct unread; effective EXT above is authoritative)
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1"], "values": [0.607, 0.7, 1.37, 0.065]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1"], "values": [0.607, 0.7, 1.37, 0.065]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1']
+  - cmp: partial:no-source-aux ext_fallback(src-only)="NO-SOURCE-AUX-PARSED:NO-SOURCE-AUX"
+### 584 mgga_c_scan_vv10 spin=1 init=mgga_c_scan_vv10_init file=mgga_c_scan.c
+- aux=[('mgga_c_scan', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[14.0, 0.0093] hyb_exx=None
+- source-ids=[267] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 267 mgga_c_scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 584 mgga_c_scan_vv10 spin=2 init=mgga_c_scan_vv10_init file=mgga_c_scan.c
+- aux=[('mgga_c_scan', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[14.0, 0.0093] hyb_exx=None
+- source-ids=[267] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 267 mgga_c_scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 585 mgga_c_revscan_vv10 spin=1 init=mgga_c_revscan_vv10_init file=mgga_c_revscan.c
+- aux=[('mgga_c_revscan', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[9.8, 0.0093] hyb_exx=None
+- source-ids=[582] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 582 mgga_c_revscan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 585 mgga_c_revscan_vv10 spin=2 init=mgga_c_revscan_vv10_init file=mgga_c_revscan.c
+- aux=[('mgga_c_revscan', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[9.8, 0.0093] hyb_exx=None
+- source-ids=[582] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 582 mgga_c_revscan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 587 gga_xc_kt3 spin=1 init=gga_xc_kt3_init file=gga_x_kt.c
+- aux=[('lda_x', -0.5877016340967667), ('gga_c_lyp', 0.864409), ('gga_x_kt1', 1.0), ('gga_x_optx', 0.6464052972361336)] mix=[-0.5877016340967667, 0.864409, 1.0, 0.6464052972361336] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 131, 145, 110] source-coefs=[-0.5877016340967667, 0.864409, 1.0, 0.6464052972361336] source-aux={"2": [-0.004, 0.1]} notes=[]
+- slot0 1 lda_x w=-0.5877016340967667 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 131 gga_c_lyp w=0.864409 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+- slot2 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.004, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.004, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=['_gamma'] at_default=['_delta']
+  - cmp: complete:full-match
+- slot3 110 gga_x_optx w=0.6464052972361336 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.05151, "b": 1.5385818404305593, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} overridden=[] at_default=['_a', '_b', '_gamma']
+  - cmp: partial:no-source-aux
+### 587 gga_xc_kt3 spin=2 init=gga_xc_kt3_init file=gga_x_kt.c
+- aux=[('lda_x', -0.5877016340967667), ('gga_c_lyp', 0.864409), ('gga_x_kt1', 1.0), ('gga_x_optx', 0.6464052972361336)] mix=[-0.5877016340967667, 0.864409, 1.0, 0.6464052972361336] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 131, 145, 110] source-coefs=[-0.5877016340967667, 0.864409, 1.0, 0.6464052972361336] source-aux={"2": [-0.004, 0.1]} notes=[]
+- slot0 1 lda_x w=-0.5877016340967667 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 131 gga_c_lyp w=0.864409 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+- slot2 145 gga_x_kt1 w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"gamma": -0.004, "delta": 0.1}
+  - ext_effective: {"names": ["_gamma", "_delta"], "values": [-0.004, 0.1]}
+  - ext_standalone: {"names": ["_gamma", "_delta"], "values": [-0.006, 0.1]} overridden=['_gamma'] at_default=['_delta']
+  - cmp: complete:full-match
+- slot3 110 gga_x_optx w=0.6464052972361336 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"a": 1.05151, "b": 1.5385818404305593, "gamma": 0.006}
+  - ext_effective: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]}
+  - ext_standalone: {"names": ["_a", "_b", "_gamma"], "values": [1.05151, 1.5385818404305593, 0.006]} overridden=[] at_default=['_a', '_b', '_gamma']
+  - cmp: partial:no-source-aux
+### 589 hyb_gga_xc_lb07 spin=1 init=hyb_gga_xc_lb07_init file=gga_xc_edf1.c
+- aux=[('lda_x_erf', 0.9), ('gga_c_lyp', 1.0)] mix=[0.9, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.5, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[546, 131] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 546 lda_x_erf w=0.9 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.5]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.3]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 589 hyb_gga_xc_lb07 spin=2 init=hyb_gga_xc_lb07_init file=gga_xc_edf1.c
+- aux=[('lda_x_erf', 0.9), ('gga_c_lyp', 1.0)] mix=[0.9, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.5, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[546, 131] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 546 lda_x_erf w=0.9 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.5]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.3]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 607 hyb_gga_xc_apbe0 spin=1 init=xc_hyb_gga_xc_apbe0_init file=gga_c_zvpbeloc.c
+- aux=[('gga_x_apbe', 0.75), ('gga_c_apbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[184, 186] source-coefs=[0.75, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 184 gga_x_apbe w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.26, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.26]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.26]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 186 gga_c_apbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.07903052324102346, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.07903052324102346, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.07903052324102346, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 607 hyb_gga_xc_apbe0 spin=2 init=xc_hyb_gga_xc_apbe0_init file=gga_c_zvpbeloc.c
+- aux=[('gga_x_apbe', 0.75), ('gga_c_apbe', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[184, 186] source-coefs=[0.75, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 184 gga_x_apbe w=0.75 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.26, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.26]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.26]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 186 gga_c_apbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.07903052324102346, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.07903052324102346, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.07903052324102346, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 608 hyb_gga_xc_hapbe spin=1 init=xc_hyb_gga_xc_hapbe_init file=gga_c_zvpbeloc.c
+- aux=[('gga_x_apbe', 0.8), ('gga_c_apbe', 0.8), ('gga_c_zvpbeloc', 0.2)] mix=[0.8, 0.8, 0.2] naux=3 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[184, 186, 606] source-coefs=[0.8, 0.8, 0.2] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 184 gga_x_apbe w=0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.26, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.26]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.26]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 186 gga_c_apbe w=0.8 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.07903052324102346, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.07903052324102346, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.07903052324102346, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+- slot2 606 gga_c_zvpbeloc w=0.2 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 608 hyb_gga_xc_hapbe spin=2 init=xc_hyb_gga_xc_hapbe_init file=gga_c_zvpbeloc.c
+- aux=[('gga_x_apbe', 0.8), ('gga_c_apbe', 0.8), ('gga_c_zvpbeloc', 0.2)] mix=[0.8, 0.8, 0.2] naux=3 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20 cam=[0.0, 0.2, 0.0] nlc=[0.0, 0.0] hyb_exx=0.2
+- source-ids=[184, 186, 606] source-coefs=[0.8, 0.8, 0.2] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 184 gga_x_apbe w=0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.26, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.26]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.26]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 186 gga_c_apbe w=0.8 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.07903052324102346, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.07903052324102346, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.07903052324102346, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+- slot2 606 gga_c_zvpbeloc w=0.2 thr=1e-10/2.220446049250313e-16/4.641588833612787e-14/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 610 hyb_gga_xc_rcam_b3lyp spin=1 init=xc_hyb_gga_xc_rcam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('lda_x', -0.13590000000000002), ('gga_x_b88', 0.002589999999999981), ('gga_x_ityh', 0.94979), ('gga_c_lyp', 1.0)] mix=[-0.13590000000000002, 0.002589999999999981, 0.94979, 1.0] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 1.13331, -0.94979] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 106, 529, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=-0.13590000000000002 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.002589999999999981 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 529 gga_x_ityh w=0.94979 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 610 hyb_gga_xc_rcam_b3lyp spin=2 init=xc_hyb_gga_xc_rcam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('lda_x', -0.13590000000000002), ('gga_x_b88', 0.002589999999999981), ('gga_x_ityh', 0.94979), ('gga_c_lyp', 1.0)] mix=[-0.13590000000000002, 0.002589999999999981, 0.94979, 1.0] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 1.13331, -0.94979] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[1, 106, 529, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 1 lda_x w=-0.13590000000000002 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.002589999999999981 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 529 gga_x_ityh w=0.94979 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot3 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 611 hyb_gga_xc_wc04 spin=1 init=xc_hyb_gga_xc_wc04_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', -0.9998), ('gga_x_b88', 0.9999), ('lda_c_vwn_rpa', 0.9998), ('gga_c_lyp', 0.0001)] mix=[-0.9998, 0.9999, 0.9998, 0.0001] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.74, 0.0] nlc=[0.0, 0.0] hyb_exx=0.74
+- source-ids=[1, 106, 8, 131] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:PP[2] - PP[1]', 'COEF-EVAL-FAIL:PP[1]', 'COEF-EVAL-FAIL:PP[4] - PP[3]', 'COEF-EVAL-FAIL:PP[3]']
+- slot0 1 lda_x w=-0.9998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.9999 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.9998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.0001 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 611 hyb_gga_xc_wc04 spin=2 init=xc_hyb_gga_xc_wc04_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', -0.9998), ('gga_x_b88', 0.9999), ('lda_c_vwn_rpa', 0.9998), ('gga_c_lyp', 0.0001)] mix=[-0.9998, 0.9999, 0.9998, 0.0001] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.74, 0.0] nlc=[0.0, 0.0] hyb_exx=0.74
+- source-ids=[1, 106, 8, 131] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:PP[2] - PP[1]', 'COEF-EVAL-FAIL:PP[1]', 'COEF-EVAL-FAIL:PP[4] - PP[3]', 'COEF-EVAL-FAIL:PP[3]']
+- slot0 1 lda_x w=-0.9998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.9999 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.9998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.0001 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 612 hyb_gga_xc_wp04 spin=1 init=xc_hyb_gga_xc_wp04_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.03849999999999998), ('gga_x_b88', 0.9614), ('lda_c_vwn_rpa', 0.9998), ('gga_c_lyp', 0.0001)] mix=[0.03849999999999998, 0.9614, 0.9998, 0.0001] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1189, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1189
+- source-ids=[1, 106, 8, 131] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:PP[2] - PP[1]', 'COEF-EVAL-FAIL:PP[1]', 'COEF-EVAL-FAIL:PP[4] - PP[3]', 'COEF-EVAL-FAIL:PP[3]']
+- slot0 1 lda_x w=0.03849999999999998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.9614 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.9998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.0001 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 612 hyb_gga_xc_wp04 spin=2 init=xc_hyb_gga_xc_wp04_init file=hyb_gga_xc_b3lyp.c
+- aux=[('lda_x', 0.03849999999999998), ('gga_x_b88', 0.9614), ('lda_c_vwn_rpa', 0.9998), ('gga_c_lyp', 0.0001)] mix=[0.03849999999999998, 0.9614, 0.9998, 0.0001] naux=4 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1189, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1189
+- source-ids=[1, 106, 8, 131] source-coefs=None source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative', 'COEF-EVAL-FAIL:PP[2] - PP[1]', 'COEF-EVAL-FAIL:PP[1]', 'COEF-EVAL-FAIL:PP[4] - PP[3]', 'COEF-EVAL-FAIL:PP[3]']
+- slot0 1 lda_x w=0.03849999999999998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"alpha": 1.0}
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 106 gga_x_b88 w=0.9614 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot2 8 lda_c_vwn_rpa w=0.9998 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.0001 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 614 hyb_gga_xc_camh_b3lyp spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.5), ('gga_x_ityh', 0.31), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.5, 0.31, 0.18999999999999995, 0.81] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 0.5, -0.31] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.31 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 614 hyb_gga_xc_camh_b3lyp spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.5), ('gga_x_ityh', 0.31), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.5, 0.31, 0.18999999999999995, 0.81] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 0.5, -0.31] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.5 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.31 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 615 hyb_gga_xc_whpbe0 spin=1 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 0.25), ('gga_c_pbe', 1.0)] mix=[0.25, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.2, 0.5, -0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=0.25 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.2]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 615 hyb_gga_xc_whpbe0 spin=2 init=hyb_gga_xc_hjs_pbe_init file=hyb_gga_xc_hse.c
+- aux=[('gga_x_hjs_pbe', 0.25), ('gga_c_pbe', 1.0)] mix=[0.25, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.2, 0.5, -0.25] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[525, 130] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 525 gga_x_hjs_pbe w=0.25 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.2]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot1 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 625 hyb_gga_xc_lc_blyp_ea spin=1 init=xc_hyb_gga_xc_lc_blyp_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.3, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[529, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.3]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 625 hyb_gga_xc_lc_blyp_ea spin=2 init=xc_hyb_gga_xc_lc_blyp_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.3, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[529, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.3]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 636 hyb_gga_xc_lc_bop spin=1 init=xc_hyb_gga_xc_lc_bop_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh', 1.0), ('gga_c_op_b88', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.47, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[529, 87] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.47]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 87 gga_c_op_b88 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 636 hyb_gga_xc_lc_bop spin=2 init=xc_hyb_gga_xc_lc_bop_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh', 1.0), ('gga_c_op_b88', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.47, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[529, 87] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.47]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 87 gga_c_op_b88 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 637 hyb_gga_xc_lc_pbeop spin=1 init=xc_hyb_gga_xc_lc_pbeop_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh_pbe', 1.0), ('gga_c_op_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[623, 86] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 623 gga_x_ityh_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu", "_omega"], "values": [0.804, 0.2195149727645171, 0.33]}
+  - ext_standalone: {"names": ["_kappa", "_mu", "_omega"], "values": [0.804, 0.2195149727645171, 0.33]} overridden=[] at_default=['_kappa', '_mu', '_omega']
+  - cmp: partial:no-source-aux
+- slot1 86 gga_c_op_pbe w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 637 hyb_gga_xc_lc_pbeop spin=2 init=xc_hyb_gga_xc_lc_pbeop_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh_pbe', 1.0), ('gga_c_op_pbe', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[623, 86] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 623 gga_x_ityh_pbe w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu", "_omega"], "values": [0.804, 0.2195149727645171, 0.33]}
+  - ext_standalone: {"names": ["_kappa", "_mu", "_omega"], "values": [0.804, 0.2195149727645171, 0.33]} overridden=[] at_default=['_kappa', '_mu', '_omega']
+  - cmp: partial:no-source-aux
+- slot1 86 gga_c_op_pbe w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 639 hyb_gga_xc_lc_blypr spin=1 init=xc_hyb_gga_xc_lc_blypr_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh', 1.0), ('gga_c_lypr', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[529, 624] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 624 gga_c_lypr w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349, "m1": 0.15283842794759825, "m2": 0.8733624454148472, "omega": 0.33}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_m1", "_m2", "_omega"], "values": [0.04918, 0.132, 0.2533, 0.349, 0.15283842794759825, 0.8733624454148472, 0.33]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_m1", "_m2", "_omega"], "values": [0.04918, 0.132, 0.2533, 0.349, 0.15283842794759825, 0.8733624454148472, 0.33]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_m1', '_m2', '_omega']
+  - cmp: partial:no-source-aux
+### 639 hyb_gga_xc_lc_blypr spin=2 init=xc_hyb_gga_xc_lc_blypr_init file=hyb_gga_xc_lc_blyp.c
+- aux=[('gga_x_ityh', 1.0), ('gga_c_lypr', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[529, 624] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 529 gga_x_ityh w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 624 gga_c_lypr w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349, "m1": 0.15283842794759825, "m2": 0.8733624454148472, "omega": 0.33}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d", "_m1", "_m2", "_omega"], "values": [0.04918, 0.132, 0.2533, 0.349, 0.15283842794759825, 0.8733624454148472, 0.33]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d", "_m1", "_m2", "_omega"], "values": [0.04918, 0.132, 0.2533, 0.349, 0.15283842794759825, 0.8733624454148472, 0.33]} overridden=[] at_default=['_a', '_b', '_c', '_d', '_m1', '_m2', '_omega']
+  - cmp: partial:no-source-aux
+### 640 hyb_gga_xc_mcam_b3lyp spin=1 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.62), ('gga_x_ityh', 0.19), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.62, 0.19, 0.18999999999999995, 0.81] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 0.38, -0.19] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.62 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.19 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 640 hyb_gga_xc_mcam_b3lyp spin=2 init=xc_hyb_gga_xc_cam_b3lyp_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_b88', 0.62), ('gga_x_ityh', 0.19), ('lda_c_vwn', 0.18999999999999995), ('gga_c_lyp', 0.81)] mix=[0.62, 0.19, 0.18999999999999995, 0.81] naux=4 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.33, 0.38, -0.19] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[106, 529, 7, 131] source-coefs=[0.0, 0.0, 0.0, 0.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 106 gga_x_b88 w=0.62 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"beta": 0.0042, "gamma": 6.0}
+  - ext_effective: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma"], "values": [0.0042, 6.0]} overridden=[] at_default=['_beta', '_gamma']
+  - cmp: partial:no-source-aux
+- slot1 529 gga_x_ityh w=0.19 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.33]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.2]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 7 lda_c_vwn w=0.18999999999999995 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot3 131 gga_c_lyp w=0.81 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 652 mgga_xc_vcml_rvv10 spin=1 init=mgga_xc_vcml_rvv10_init file=mgga_x_vcml.c
+- aux=[('mgga_x_vcml', 1.0), ('gga_c_regtpss', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[15.35, 0.0093] hyb_exx=None
+- source-ids=[651, 83] source-coefs=[1.0, 1.0] source-aux={} notes=[]
+- slot0 651 mgga_x_vcml w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 83 gga_c_regtpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 652 mgga_xc_vcml_rvv10 spin=2 init=mgga_xc_vcml_rvv10_init file=mgga_x_vcml.c
+- aux=[('mgga_x_vcml', 1.0), ('gga_c_regtpss', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[15.35, 0.0093] hyb_exx=None
+- source-ids=[651, 83] source-coefs=[1.0, 1.0] source-aux={} notes=[]
+- slot0 651 mgga_x_vcml w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 83 gga_c_regtpss w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 659 hyb_mgga_xc_r2scanh spin=1 init=hyb_mgga_xc_init file=hyb_mgga_xc_r2scan.c
+- aux=[('mgga_x_r2scan', 0.9), ('mgga_c_r2scan', 1.0)] mix=[0.9, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1
+- source-ids=[497, 498] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 497 mgga_x_r2scan w=0.9 thr=1e-11/2.220446049250313e-16/2.1544346900318875e-15/1e-20
+  - internal-struct: {"c1": 0.667, "c2": 0.8, "d": 1.24, "k1": 0.065, "eta": 0.001, "dp2": 0.361}
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1', '_eta', '_dp2']
+  - cmp: partial:no-source-aux
+- slot1 498 mgga_c_r2scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"eta": 0.001}
+  - ext_effective: {"names": ["_eta"], "values": [0.001]}
+  - ext_standalone: {"names": ["_eta"], "values": [0.001]} overridden=[] at_default=['_eta']
+  - cmp: partial:no-source-aux
+### 659 hyb_mgga_xc_r2scanh spin=2 init=hyb_mgga_xc_init file=hyb_mgga_xc_r2scan.c
+- aux=[('mgga_x_r2scan', 0.9), ('mgga_c_r2scan', 1.0)] mix=[0.9, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.1, 0.0] nlc=[0.0, 0.0] hyb_exx=0.1
+- source-ids=[497, 498] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 497 mgga_x_r2scan w=0.9 thr=1e-11/2.220446049250313e-16/2.1544346900318875e-15/1e-20
+  - internal-struct: {"c1": 0.667, "c2": 0.8, "d": 1.24, "k1": 0.065, "eta": 0.001, "dp2": 0.361}
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1', '_eta', '_dp2']
+  - cmp: partial:no-source-aux
+- slot1 498 mgga_c_r2scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"eta": 0.001}
+  - ext_effective: {"names": ["_eta"], "values": [0.001]}
+  - ext_standalone: {"names": ["_eta"], "values": [0.001]} overridden=[] at_default=['_eta']
+  - cmp: partial:no-source-aux
+### 660 hyb_mgga_xc_r2scan0 spin=1 init=hyb_mgga_xc_init file=hyb_mgga_xc_r2scan.c
+- aux=[('mgga_x_r2scan', 0.75), ('mgga_c_r2scan', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[497, 498] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 497 mgga_x_r2scan w=0.75 thr=1e-11/2.220446049250313e-16/2.1544346900318875e-15/1e-20
+  - internal-struct: {"c1": 0.667, "c2": 0.8, "d": 1.24, "k1": 0.065, "eta": 0.001, "dp2": 0.361}
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1', '_eta', '_dp2']
+  - cmp: partial:no-source-aux
+- slot1 498 mgga_c_r2scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"eta": 0.001}
+  - ext_effective: {"names": ["_eta"], "values": [0.001]}
+  - ext_standalone: {"names": ["_eta"], "values": [0.001]} overridden=[] at_default=['_eta']
+  - cmp: partial:no-source-aux
+### 660 hyb_mgga_xc_r2scan0 spin=2 init=hyb_mgga_xc_init file=hyb_mgga_xc_r2scan.c
+- aux=[('mgga_x_r2scan', 0.75), ('mgga_c_r2scan', 1.0)] mix=[0.75, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.25, 0.0] nlc=[0.0, 0.0] hyb_exx=0.25
+- source-ids=[497, 498] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 497 mgga_x_r2scan w=0.75 thr=1e-11/2.220446049250313e-16/2.1544346900318875e-15/1e-20
+  - internal-struct: {"c1": 0.667, "c2": 0.8, "d": 1.24, "k1": 0.065, "eta": 0.001, "dp2": 0.361}
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1', '_eta', '_dp2']
+  - cmp: partial:no-source-aux
+- slot1 498 mgga_c_r2scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"eta": 0.001}
+  - ext_effective: {"names": ["_eta"], "values": [0.001]}
+  - ext_standalone: {"names": ["_eta"], "values": [0.001]} overridden=[] at_default=['_eta']
+  - cmp: partial:no-source-aux
+### 661 hyb_mgga_xc_r2scan50 spin=1 init=hyb_mgga_xc_init file=hyb_mgga_xc_r2scan.c
+- aux=[('mgga_x_r2scan', 0.5), ('mgga_c_r2scan', 1.0)] mix=[0.5, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[497, 498] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 497 mgga_x_r2scan w=0.5 thr=1e-11/2.220446049250313e-16/2.1544346900318875e-15/1e-20
+  - internal-struct: {"c1": 0.667, "c2": 0.8, "d": 1.24, "k1": 0.065, "eta": 0.001, "dp2": 0.361}
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1', '_eta', '_dp2']
+  - cmp: partial:no-source-aux
+- slot1 498 mgga_c_r2scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"eta": 0.001}
+  - ext_effective: {"names": ["_eta"], "values": [0.001]}
+  - ext_standalone: {"names": ["_eta"], "values": [0.001]} overridden=[] at_default=['_eta']
+  - cmp: partial:no-source-aux
+### 661 hyb_mgga_xc_r2scan50 spin=2 init=hyb_mgga_xc_init file=hyb_mgga_xc_r2scan.c
+- aux=[('mgga_x_r2scan', 0.5), ('mgga_c_r2scan', 1.0)] mix=[0.5, 1.0] naux=2 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.5, 0.0] nlc=[0.0, 0.0] hyb_exx=0.5
+- source-ids=[497, 498] source-coefs=[0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 497 mgga_x_r2scan w=0.5 thr=1e-11/2.220446049250313e-16/2.1544346900318875e-15/1e-20
+  - internal-struct: {"c1": 0.667, "c2": 0.8, "d": 1.24, "k1": 0.065, "eta": 0.001, "dp2": 0.361}
+  - ext_effective: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]}
+  - ext_standalone: {"names": ["_c1", "_c2", "_d", "_k1", "_eta", "_dp2"], "values": [0.667, 0.8, 1.24, 0.065, 0.001, 0.361]} overridden=[] at_default=['_c1', '_c2', '_d', '_k1', '_eta', '_dp2']
+  - cmp: partial:no-source-aux
+- slot1 498 mgga_c_r2scan w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"eta": 0.001}
+  - ext_effective: {"names": ["_eta"], "values": [0.001]}
+  - ext_standalone: {"names": ["_eta"], "values": [0.001]} overridden=[] at_default=['_eta']
+  - cmp: partial:no-source-aux
+### 681 hyb_gga_xc_cam_pbeh spin=1 init=hyb_gga_xc_cam_pbeh_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_pbe', 0.8), ('gga_x_hjs_pbe', -0.8), ('gga_c_pbe', 1.0)] mix=[0.8, -0.8, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.7, 0.2, 0.8] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 525, 130] source-coefs=[0.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 525 gga_x_hjs_pbe w=-0.8 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.7]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 681 hyb_gga_xc_cam_pbeh spin=2 init=hyb_gga_xc_cam_pbeh_init file=hyb_gga_xc_cam_b3lyp.c
+- aux=[('gga_x_pbe', 0.8), ('gga_x_hjs_pbe', -0.8), ('gga_c_pbe', 1.0)] mix=[0.8, -0.8, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.7, 0.2, 0.8] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 525, 130] source-coefs=[0.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 525 gga_x_hjs_pbe w=-0.8 thr=5e-12/2.220446049250313e-16/8.549879733383501e-16/1e-20
+  - internal-struct: {"a": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061], "b": [5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484]}
+  - ext_effective: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.7]}
+  - ext_standalone: {"names": ["_a0", "_a1", "_a2", "_a3", "_a4", "_a5", "_b0", "_b1", "_b2", "_b3", "_b4", "_b5", "_b6", "_b7", "_b8", "_omega"], "values": [0.0159941, 0.0852995, -0.160368, 0.152645, -0.0971263, 0.0422061, 5.33319, -12.478, 11.0988, -5.11013, 1.71468, -0.61038, 0.307555, -0.0770547, 0.033484, 0.11]} overridden=['_omega'] at_default=['_a0', '_a1', '_a2', '_a3', '_a4', '_a5', '_b0', '_b1', '_b2', '_b3', '_b4', '_b5', '_b6', '_b7', '_b8']
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 682 hyb_gga_xc_camy_pbeh spin=1 init=hyb_gga_xc_camy_pbeh_init file=hyb_gga_xc_camy_b3lyp.c
+- aux=[('gga_x_pbe', 0.8), ('gga_x_sfat', -0.8), ('gga_c_pbe', 1.0)] mix=[0.8, -0.8, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.7, 0.2, 0.8] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 530, 130] source-coefs=[0.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 530 gga_x_sfat w=-0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.7]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 682 hyb_gga_xc_camy_pbeh spin=2 init=hyb_gga_xc_camy_pbeh_init file=hyb_gga_xc_camy_b3lyp.c
+- aux=[('gga_x_pbe', 0.8), ('gga_x_sfat', -0.8), ('gga_c_pbe', 1.0)] mix=[0.8, -0.8, 1.0] naux=3 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.7, 0.2, 0.8] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[101, 530, 130] source-coefs=[0.0, 0.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 101 gga_x_pbe w=0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"kappa": 0.804, "mu": 0.2195149727645171, "lambda": 0.0}
+  - ext_effective: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]}
+  - ext_standalone: {"names": ["_kappa", "_mu"], "values": [0.804, 0.2195149727645171]} overridden=[] at_default=['_kappa', '_mu']
+  - cmp: partial:no-source-aux
+- slot1 530 gga_x_sfat w=-0.8 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.7]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.44]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot2 130 gga_c_pbe w=1.0 thr=1e-12/2.220446049250313e-16/1.0000000000000021e-16/1e-20
+  - internal-struct: {"beta": 0.06672455060314922, "gamma": 0.031090690869654894, "BB": 1.0, "tscale": 1.0}
+  - ext_effective: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]}
+  - ext_standalone: {"names": ["_beta", "_gamma", "_B", "_tscale"], "values": [0.06672455060314922, 0.031090690869654894, 1.0, 1.0]} overridden=[] at_default=['_beta', '_gamma', '_B', '_tscale']
+  - cmp: partial:no-source-aux
+### 695 hyb_mgga_xc_edmggah spin=1 init=hyb_mgga_xc_edmggah_init file=mgga_x_edmgga.c
+- aux=[('mgga_x_edmgga', 0.78), ('mgga_c_cs', 1.0)] mix=[0.78, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22
+- source-ids=[686, 72] source-coefs=[0.78, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 686 mgga_x_edmgga w=0.78 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 72 mgga_c_cs w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 695 hyb_mgga_xc_edmggah spin=2 init=hyb_mgga_xc_edmggah_init file=mgga_x_edmgga.c
+- aux=[('mgga_x_edmgga', 0.78), ('mgga_c_cs', 1.0)] mix=[0.78, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.0, 0.22, 0.0] nlc=[0.0, 0.0] hyb_exx=0.22
+- source-ids=[686, 72] source-coefs=[0.78, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 686 mgga_x_edmgga w=0.78 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+- slot1 72 mgga_c_cs w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": [], "values": []}
+  - ext_standalone: {"names": [], "values": []} overridden=[] at_default=[]
+  - cmp: complete:parameterless (no EXT params, no source aux)
+### 703 mgga_c_scanl_rvv10 spin=1 init=mgga_c_scan_rvv10_init file=mgga_c_scanl.c
+- aux=[('mgga_c_scanl', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[15.7, 0.0093] hyb_exx=None
+- source-ids=[702] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 702 mgga_c_scanl w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pc07_a": 1.78472, "pc07_b": 0.258304}
+  - ext_effective: {"names": ["_a", "_b"], "values": [1.78472, 0.258304]}
+  - ext_standalone: {"names": ["_a", "_b"], "values": [1.78472, 0.258304]} overridden=[] at_default=['_a', '_b']
+  - cmp: partial:no-source-aux
+### 703 mgga_c_scanl_rvv10 spin=2 init=mgga_c_scan_rvv10_init file=mgga_c_scanl.c
+- aux=[('mgga_c_scanl', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[15.7, 0.0093] hyb_exx=None
+- source-ids=[702] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 702 mgga_c_scanl w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pc07_a": 1.78472, "pc07_b": 0.258304}
+  - ext_effective: {"names": ["_a", "_b"], "values": [1.78472, 0.258304]}
+  - ext_standalone: {"names": ["_a", "_b"], "values": [1.78472, 0.258304]} overridden=[] at_default=['_a', '_b']
+  - cmp: partial:no-source-aux
+### 704 mgga_c_scanl_vv10 spin=1 init=mgga_c_scan_vv10_init file=mgga_c_scanl.c
+- aux=[('mgga_c_scanl', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[14.0, 0.0093] hyb_exx=None
+- source-ids=[702] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 702 mgga_c_scanl w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pc07_a": 1.78472, "pc07_b": 0.258304}
+  - ext_effective: {"names": ["_a", "_b"], "values": [1.78472, 0.258304]}
+  - ext_standalone: {"names": ["_a", "_b"], "values": [1.78472, 0.258304]} overridden=[] at_default=['_a', '_b']
+  - cmp: partial:no-source-aux
+### 704 mgga_c_scanl_vv10 spin=2 init=mgga_c_scan_vv10_init file=mgga_c_scanl.c
+- aux=[('mgga_c_scanl', 1.0)] mix=[1.0] naux=1 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20 cam=[0.0, 0.0, 0.0] nlc=[14.0, 0.0093] hyb_exx=None
+- source-ids=[702] source-coefs=[1.0] source-aux={} notes=[]
+- slot0 702 mgga_c_scanl w=1.0 thr=1e-15/2.220446049250313e-16/1.0000000000000027e-20/1e-20
+  - internal-struct: {"pc07_a": 1.78472, "pc07_b": 0.258304}
+  - ext_effective: {"names": ["_a", "_b"], "values": [1.78472, 0.258304]}
+  - ext_standalone: {"names": ["_a", "_b"], "values": [1.78472, 0.258304]} overridden=[] at_default=['_a', '_b']
+  - cmp: partial:no-source-aux
+### 720 hyb_mgga_xc_lc_tmlyp spin=1 init=hyb_mgga_xc_lc_tmlyp_init file=hyb_mgga_x_pjs18.c
+- aux=[('hyb_mgga_x_pjs18', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.28, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[706, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 706 hyb_mgga_x_pjs18 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.28]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.33]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
+### 720 hyb_mgga_xc_lc_tmlyp spin=2 init=hyb_mgga_xc_lc_tmlyp_init file=hyb_mgga_x_pjs18.c
+- aux=[('hyb_mgga_x_pjs18', 1.0), ('gga_c_lyp', 1.0)] mix=[1.0, 1.0] naux=2 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20 cam=[0.28, 1.0, -1.0] nlc=[0.0, 0.0] hyb_exx=None
+- source-ids=[706, 131] source-coefs=[1.0, 1.0] source-aux={} notes=['HYB-POSTINIT-OVERWRITES-COEF:readback-authoritative']
+- slot0 706 hyb_mgga_x_pjs18 w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: LIMIT NOPARAMS-FILE:parameterless component
+  - ext_effective: {"names": ["_omega"], "values": [0.28]}
+  - ext_standalone: {"names": ["_omega"], "values": [0.33]} overridden=['_omega'] at_default=[]
+  - cmp: partial:no-source-aux
+- slot1 131 gga_c_lyp w=1.0 thr=1e-14/2.220446049250313e-16/2.1544346900318888e-19/1e-20
+  - internal-struct: {"a": 0.04918, "b": 0.132, "c": 0.2533, "d": 0.349}
+  - ext_effective: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]}
+  - ext_standalone: {"names": ["_a", "_b", "_c", "_d"], "values": [0.04918, 0.132, 0.2533, 0.349]} overridden=[] at_default=['_a', '_b', '_c', '_d']
+  - cmp: partial:no-source-aux
