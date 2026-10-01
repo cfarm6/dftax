@@ -40,12 +40,15 @@ for f in sorted(glob.glob(a.src + "/*.c")):
         flags = set(re.findall(r"XC_FLAGS_([A-Z0-9_]+)", body))
         deriv = sorted(re.findall(r"XC_FLAGS_(I_HAVE_[A-Z]+|HAVE_[A-Z]+)",
                                      body))
+        maple = "MAPLE2C_FLAGS" if "MAPLE2C_FLAGS" in body else None
         infos[m.group(1)] = dict(
             fam=fam.group(1) if fam else "?",
             kind=kind.group(1) if kind else "?",
             flags=sorted(flags),
-            raw_flags=sorted("XC_FLAGS_" + f for f in flags),
-            deriv_flags=deriv)
+            raw_flags=(sorted("XC_FLAGS_" + f for f in flags) +
+                         ([maple] if maple else [])),
+            deriv_flags=deriv,
+            maple2c=bool(maple))
 assert len(infos) == 709, len(infos)
 
 led = json.load(open(a.ledger))["rows"]
@@ -84,6 +87,7 @@ for k, v in led.items():
         development="DEVELOPMENT" in fl,
         enforce_fhc="ENFORCE_FHC" in fl,
         raw_flags=i.get("raw_flags"), deriv_flags=i.get("deriv_flags"),
+        maple2c=i.get("maple2c"),
         energy_spin1=s1.get("zk"), energy_spin2=s2.get("zk"),
         source_only_clean=s1.get("source_only_clean"),
         proof_complete=s1.get("proof_complete"),
