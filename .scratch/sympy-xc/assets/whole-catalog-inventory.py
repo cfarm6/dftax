@@ -28,30 +28,83 @@ ap.add_argument("--out", required=True)
 a = ap.parse_args()
 
 infos = {}
+numdefs = {}  # XC_* name -> number, from #defines across src
+for f in sorted(glob.glob(a.src + "/*.c") + glob.glob(a.src + "/*.h")):
+    for m in re.finditer(r"#define\s+(XC_[A-Z0-9_]+)\s+(\d+)",
+                         open(f).read()):
+        numdefs.setdefault(m.group(1), int(m.group(2)))
 for f in sorted(glob.glob(a.src + "/*.c")):
     text = open(f).read()
+    incs = re.findall(r'#include\s+"(maple2c/[^"]+)"', text)
+    expansions = set()
+    for inc in incs:
+        try:
+            t2 = open(a.src + "/" + inc).read()
+        except OSError:
+            continue
+        d = re.search(r"#define\s+MAPLE2C_FLAGS\s+(.*?)\n", t2)
+        if d:
+            expansions.add(d.group(1).strip())
+    assert len(expansions) <= 1, (f, expansions)
+    expansion = next(iter(expansions)) if expansions else None
     for m in re.finditer(
-        r"const\s+xc_func_info_type\s+xc_func_info_(\w+)\s*=\s*\{(.*?)\n\};",
-        text, re.S):
+            r"const\s+xc_func_info_type\s+xc_func_info_(\w+)\s*=\s*\{(.*?)\n\};",
+            text, re.S):
         body = m.group(2)
         fam = re.search(r"XC_FAMILY_(\w+)", body)
         kind = re.search(
             r"XC_(EXCHANGE_CORRELATION|EXCHANGE|CORRELATION|KINETIC)", body)
         flags = set(re.findall(r"XC_FLAGS_([A-Z0-9_]+)", body))
+        numtok = body.split(",")[0].strip()
+        src_id = numdefs.get(numtok)
+        assert src_id is not None, (f, m.group(1), numtok)
         deriv = sorted(re.findall(r"XC_FLAGS_(I_HAVE_[A-Z]+|HAVE_[A-Z]+)",
-                                     body))
-        maple = "MAPLE2C_FLAGS" if "MAPLE2C_FLAGS" in body else None
+                                  body))
+        if "MAPLE2C_FLAGS" in body:
+            assert expansion is not None, (f, m.group(1))
+            # resolved availability: expand included generated macro.
+            # This is the source-declared derivative availability, NOT a
+            # MAXORDER=0 oracle claim: the pinned oracle build caps helper
+            # differentiation at order 0 (defaults+energy only).
+            deriv = sorted(set(deriv)
+                           | set(re.findall(r"XC_FLAGS_(I_HAVE_[A-Z]+)",
+                                            expansion)))
+            maple = "MAPLE2C_FLAGS"
+        else:
+            maple = None
         infos[m.group(1)] = dict(
+            src_id=src_id,
             fam=fam.group(1) if fam else "?",
             kind=kind.group(1) if kind else "?",
             flags=sorted(flags),
             raw_flags=(sorted("XC_FLAGS_" + f for f in flags) +
-                         ([maple] if maple else [])),
+                       ([maple] if maple else [])),
             deriv_flags=deriv,
-            maple2c=bool(maple))
+            maple_expansion=expansion,
+            maple2c=bool(maple),
+            def_file=f.split("/")[-1])
 assert len(infos) == 709, len(infos)
 
+# registration set equality: funcs_key.c names/ids == xc_funcs.h ids == ledger
+key_pairs = re.findall(r'\{"([^"]+)",\s*(\d+)\}',
+                       open(a.src + "/funcs_key.c").read())
+key_ids = sorted({int(i) for _, i in key_pairs})
+key_names = sorted({n for n, _ in key_pairs})
+h_ids = sorted(set(numdefs.values()))
 led = json.load(open(a.ledger))["rows"]
+led_ids = sorted(v["fid"] for v in led.values())
+src_ids = sorted(v["src_id"] for v in infos.values())
+assert src_ids == led_ids == key_ids, (
+    len(src_ids), len(led_ids), len(key_ids))
+mismatch = [k for k, v in led.items()
+            if infos[k]["src_id"] != v["fid"]]
+assert not mismatch, mismatch
+led_names = set()
+for v in led.values():
+    led_names.update(v.get("aliases", []))
+assert sorted(led_names) == key_names, (
+    len(led_names), len(key_names))
+
 comp = json.load(open(a.composites))
 aux_by_fid = {}
 for r in comp:
@@ -60,8 +113,27 @@ for r in comp:
         "aux_names": r["aux_names"],
         "aux": [[c["id"], c["name"], c["weight"]]
                 for c in r["components"]],
-        "mix_coef": r["mix_coef"]}
-
+        "mix_coef": r["mix_coef"],
+        "coef_note": r.get("coef_note"),
+        "discrepancy": r.get("discrepancy", []),
+        "components": [
+            {"slot": c["slot"], "id": c["id"], "name": c["name"],
+             "weight": c["weight"], "cmp": c["cmp"],
+             "ext_effective": c["ext_effective"],
+             "ext_standalone": c["ext_standalone"],
+             "overridden": c.get("overridden"), "at_default": c.get("at_default"),
+             "params": c.get("params"), "params_limit": c.get("params_limit")}
+            for c in r["components"]]}
+assert len(comp) == 308, len(comp)
+from collections import Counter as _C
+assert _C(r["spin"] for r in comp) == {1: 154, 2: 154}, _C(
+    r["spin"] for r in comp)
+mix_fids = sorted(v["fid"] for v in led.values() if v["cls"] == "mix_only")
+assert sorted(aux_by_fid) == mix_fids, (
+    len(aux_by_fid), len(mix_fids))
+assert all(sorted(aux_by_fid[f]) == [1, 2] for f in aux_by_fid)
+assert all(not aux_by_fid[f][s]["discrepancy"]
+           for f in aux_by_fid for s in (1, 2))
 rows = []
 for k, v in led.items():
     i = infos[k]
@@ -82,8 +154,12 @@ for k, v in led.items():
         needs_laplacian="NEEDS_LAPLACIAN" in fl,
         hyb_cam="HYB_CAM" in fl, hyb_camy="HYB_CAMY" in fl,
         vv10="VV10" in fl,
-        nonlocal_kernel=("rvv10" if "VV10" in fl and "rvv10" in k
-                         else ("vv10" if "VV10" in fl else None)),
+        nonlocal_kernel=(
+            "VV10-flagged/rVV10-intended-TBD" if v["fid"] == 652
+            else ("rvv10" if v["fid"] in (292, 703)
+                  or ("VV10" in fl and "rvv10" in k
+                      and v["fid"] not in (652,))
+                  else ("vv10" if "VV10" in fl else None))),
         development="DEVELOPMENT" in fl,
         enforce_fhc="ENFORCE_FHC" in fl,
         raw_flags=i.get("raw_flags"), deriv_flags=i.get("deriv_flags"),
@@ -94,6 +170,7 @@ for k, v in led.items():
         runtime_cam=rt.get("cam"),
         runtime_hyb_exx=rt.get("hyb_exx"),
         aux_operators=aux,  # None for non-composite; cam/nlc/hyb_exx+comps
+        # + coef_note/discrepancy/per-component cmp+params provenance
         module=s1.get("module"), base=v.get("base")))
 
 rows.sort(key=lambda r: r["id"])
