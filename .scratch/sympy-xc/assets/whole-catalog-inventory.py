@@ -154,6 +154,10 @@ for k, v in led.items():
         needs_laplacian="NEEDS_LAPLACIAN" in fl,
         hyb_cam="HYB_CAM" in fl, hyb_camy="HYB_CAMY" in fl,
         vv10="VV10" in fl,
+        operator_class=(
+            "finite-T free energy" if v["fid"] in (259, 318, 577)
+            else ("multicomponent electron-proton" if v["fid"] in
+                  (328, 329, 330, 331) else None)),
         nonlocal_kernel=(
             "VV10-flagged/rVV10-intended-TBD" if v["fid"] == 652
             else ("rvv10" if v["fid"] in (292, 703)
@@ -199,6 +203,8 @@ groups = {
     "development": L(lambda r: r["development"]),
     "potential_only": L(lambda r:
                         r["energy_spin1"] == "NO_EXC_POTENTIAL_ONLY"),
+    "thermal_finite_T": [259, 318, 577],
+    "multicomponent_epc": [328, 329, 330, 331],
     "spline_opaque_CASE21": [390],
     "enforce_fhc": L(lambda r: r["enforce_fhc"]),
     "composites_mix_only": L(lambda r: r["cls"] == "mix_only"),

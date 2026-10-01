@@ -35,12 +35,19 @@ expected = {
     "development": {r["id"] for r in rows if r["development"]},
     "potential_only": {r["id"] for r in rows
                        if r["energy_spin1"] == "NO_EXC_POTENTIAL_ONLY"},
+    "thermal_finite_T": {259, 318, 577},
+    "multicomponent_epc": {328, 329, 330, 331},
     "spline_opaque_CASE21": {390},
     "enforce_fhc": {r["id"] for r in rows if r["enforce_fhc"]},
     "composites_mix_only": {r["id"] for r in rows
                             if r["cls"] == "mix_only"},
 }
 row_ids = {r["id"] for r in rows}
+byid = {r["id"]: r for r in rows}
+assert {i for i in row_ids
+        if byid[i]["operator_class"] == "finite-T free energy"} == {259, 318, 577}
+assert {i for i in row_ids
+        if byid[i]["operator_class"] == "multicomponent electron-proton"} == {328, 329, 330, 331}
 for k, v in inv["groups"].items():
     assert k in expected, k
     stored = set(v)
